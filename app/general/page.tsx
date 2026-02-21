@@ -19,10 +19,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Calendar, FileJson, Ship as ShipIcon, Code, HardDrive } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 export default function GeneralPage() {
   const { data, updateData, images } = useAppDataStore();
   const { devMode, setDevMode } = usePreferencesStore();
+  const { t } = useT();
   const [showDevModeDialog, setShowDevModeDialog] = useState(false);
   const [pendingDevMode, setPendingDevMode] = useState(false);
 
@@ -48,7 +50,7 @@ export default function GeneralPage() {
   if (!data) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">No data loaded</p>
+        <p className="text-muted-foreground">{t("common.noDataLoaded")}</p>
       </div>
     );
   }
@@ -62,9 +64,9 @@ export default function GeneralPage() {
   return (
     <div className="p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">General Settings</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("general.title")}</h1>
         <p className="text-muted-foreground">
-          Manage general metadata and information about your ship companion app
+          {t("general.subtitle")}
         </p>
       </div>
 
@@ -72,13 +74,13 @@ export default function GeneralPage() {
         {/* Basic Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-            <CardDescription>Edit ship name and version</CardDescription>
+            <CardTitle>{t("general.basicInfo")}</CardTitle>
+            <CardDescription>{t("general.basicInfoDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="shipName">
-                Ship Name
+                {t("general.shipName")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <div className="flex items-center gap-2">
@@ -89,7 +91,7 @@ export default function GeneralPage() {
                   onChange={(e) =>
                     updateData((d) => ({ ...d, shipName: e.target.value }))
                   }
-                  placeholder="Enter ship name"
+                  placeholder={t("general.shipNamePlaceholder")}
                   required
                 />
               </div>
@@ -97,7 +99,7 @@ export default function GeneralPage() {
 
             <div className="space-y-2">
               <Label htmlFor="version">
-                Version
+                {t("general.version")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <div className="flex items-center gap-2">
@@ -108,14 +110,14 @@ export default function GeneralPage() {
                   onChange={(e) =>
                     updateData((d) => ({ ...d, version: e.target.value }))
                   }
-                  placeholder="e.g., 2.0.0"
+                  placeholder={t("general.versionPlaceholder")}
                   pattern="\d+\.\d+\.\d+"
-                  title="Version must be in format X.Y.Z"
+                  title={t("general.versionTitle")}
                   required
                 />
               </div>
               <p className="text-sm text-muted-foreground">
-                Use semantic versioning (e.g., 2.0.0)
+                {t("general.versionHint")}
               </p>
             </div>
           </CardContent>
@@ -124,19 +126,19 @@ export default function GeneralPage() {
         {/* Export Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Export Information</CardTitle>
-            <CardDescription>Last export date (read-only)</CardDescription>
+            <CardTitle>{t("general.exportInfo")}</CardTitle>
+            <CardDescription>{t("general.exportInfoDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Last exported:</span>
+              <span className="text-muted-foreground">{t("general.lastExported")}</span>
               <Badge variant="outline">
                 {new Date(data.exportDate).toLocaleString()}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              This date will be automatically updated when you export the file
+              {t("general.exportDateNote")}
             </p>
           </CardContent>
         </Card>
@@ -144,41 +146,41 @@ export default function GeneralPage() {
         {/* Statistics */}
         <Card>
           <CardHeader>
-            <CardTitle>Data Statistics</CardTitle>
-            <CardDescription>Overview of your content</CardDescription>
+            <CardTitle>{t("general.statistics")}</CardTitle>
+            <CardDescription>{t("general.statisticsDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Recipes</p>
+                <p className="text-sm text-muted-foreground">{t("general.statRecipes")}</p>
                 <p className="text-2xl font-bold">{data.data.recipes.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Cities</p>
+                <p className="text-sm text-muted-foreground">{t("general.statCities")}</p>
                 <p className="text-2xl font-bold">{data.data.cities.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Points</p>
+                <p className="text-sm text-muted-foreground">{t("general.statPoints")}</p>
                 <p className="text-2xl font-bold">{data.data.points.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Cabins</p>
+                <p className="text-sm text-muted-foreground">{t("general.statCabins")}</p>
                 <p className="text-2xl font-bold">{data.data.cabins.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Checklists</p>
+                <p className="text-sm text-muted-foreground">{t("general.statChecklists")}</p>
                 <p className="text-2xl font-bold">{data.data.checklists.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">FAQ Items</p>
+                <p className="text-sm text-muted-foreground">{t("general.statFaqItems")}</p>
                 <p className="text-2xl font-bold">{data.data.questions.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Ship Facts</p>
+                <p className="text-sm text-muted-foreground">{t("general.statShipFacts")}</p>
                 <p className="text-2xl font-bold">{data.data.about.facts.length}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Equipment</p>
+                <p className="text-sm text-muted-foreground">{t("general.statEquipment")}</p>
                 <p className="text-2xl font-bold">
                   {data.data.about.equipment?.length || 0}
                 </p>
@@ -188,12 +190,12 @@ export default function GeneralPage() {
             <div className="border-t pt-4 mt-4">
               <div className="flex items-center gap-2 mb-3">
                 <HardDrive className="h-4 w-4 text-muted-foreground" />
-                <p className="text-sm font-medium">Storage</p>
+                <p className="text-sm font-medium">{t("general.storage")}</p>
               </div>
               <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
-                <span>App data: {formatBytes(dataSize)}</span>
-                <span>Images ({imageCount}): {formatBytes(imagesSize)}</span>
-                <span className="font-medium text-foreground">Total: {formatBytes(totalSize)}</span>
+                <span>{t("general.storageAppData", { size: formatBytes(dataSize) })}</span>
+                <span>{t("general.storageImages", { count: imageCount, size: formatBytes(imagesSize) })}</span>
+                <span className="font-medium text-foreground">{t("general.storageTotal", { size: formatBytes(totalSize) })}</span>
               </div>
             </div>
           </CardContent>
@@ -204,20 +206,20 @@ export default function GeneralPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code className="h-5 w-5" />
-              Developer Mode
+              {t("general.devMode")}
             </CardTitle>
             <CardDescription>
-              Enable advanced editing features and developer tools
+              {t("general.devModeDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="dev-mode">Developer Mode</Label>
+                <Label htmlFor="dev-mode">{t("general.devModeLabel")}</Label>
                 <p className="text-sm text-muted-foreground">
                   {devMode
-                    ? "Advanced features are visible"
-                    : "Some features are hidden"}
+                    ? t("general.devModeOn")
+                    : t("general.devModeOff")}
                 </p>
               </div>
               <Switch
@@ -237,20 +239,20 @@ export default function GeneralPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingDevMode ? "Enable Developer Mode?" : "Disable Developer Mode?"}
+              {pendingDevMode ? t("general.enableDevMode") : t("general.disableDevMode")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDevMode
-                ? "This will show advanced editing features that are normally hidden. Only enable this if you know what you are doing."
-                : "This will hide advanced editing features. You can re-enable it at any time."}
+                ? t("general.enableDevModeDesc")
+                : t("general.disableDevModeDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => setDevMode(pendingDevMode)}
             >
-              {pendingDevMode ? "Enable" : "Disable"}
+              {pendingDevMode ? t("common.enable") : t("common.disable")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

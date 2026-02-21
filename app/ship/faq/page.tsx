@@ -13,9 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import type { LanguageCode, Question } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export default function FAQPage() {
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [openItem, setOpenItem] = useState<string>("0");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
 
@@ -47,11 +49,11 @@ export default function FAQPage() {
     }));
 
     setOpenItem(String(questions.length));
-    toast.success("New FAQ question added");
+    toast.success(t("faq.toastAdded"));
   };
 
   const removeQuestion = (index: number) => {
-    if (confirm("Are you sure you want to delete this FAQ question?")) {
+    if (confirm(t("faq.deleteConfirm"))) {
       updateData((d) => ({
         ...d,
         data: {
@@ -59,7 +61,7 @@ export default function FAQPage() {
           questions: d.data.questions.filter((_, i) => i !== index),
         },
       }));
-      toast.success("FAQ question deleted");
+      toast.success(t("faq.toastDeleted"));
     }
   };
 
@@ -87,24 +89,24 @@ export default function FAQPage() {
     <div className="p-6 max-w-4xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">FAQ</h1>
+          <h1 className="text-3xl font-bold mb-2">{t("faq.title")}</h1>
           <p className="text-muted-foreground">
-            Manage frequently asked questions ({questions.length} questions)
+            {t("faq.subtitle", { count: questions.length })}
           </p>
         </div>
         <Button onClick={addQuestion} className="gap-2">
           <Plus className="h-4 w-4" />
-          Add Question
+          {t("faq.addQuestion")}
         </Button>
       </div>
 
       {questions.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground mb-4">No FAQ questions yet</p>
+            <p className="text-muted-foreground mb-4">{t("faq.noQuestions")}</p>
             <Button onClick={addQuestion} className="gap-2">
               <Plus className="h-4 w-4" />
-              Add First Question
+              {t("faq.addFirstQuestion")}
             </Button>
           </CardContent>
         </Card>
@@ -117,7 +119,7 @@ export default function FAQPage() {
                   <div className="flex items-center gap-3 flex-1 text-left">
                     <GripVertical className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">
-                      {question.translations.en.questiontext || `Question ${index + 1}`}
+                      {question.translations.en.questiontext || t("faq.questionFallback", { index: index + 1 })}
                     </span>
                   </div>
                 </AccordionTrigger>
@@ -168,7 +170,7 @@ export default function FAQPage() {
                         className="gap-2"
                       >
                         <Trash2 className="h-4 w-4" />
-                        Delete Question
+                        {t("faq.deleteQuestion")}
                       </Button>
                     </div>
                   </CardContent>

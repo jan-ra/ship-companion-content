@@ -32,13 +32,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Plus, Trash2, X, Info } from "lucide-react";
 import { toast } from "sonner";
 import type { LanguageCode, Ingredient } from "@/lib/types";
-
-const RECIPE_TYPES = [
-  { value: "omni", label: "Omnivore" },
-  { value: "vegetarian", label: "Vegetarian" },
-  { value: "vegan", label: "Vegan" },
-];
-
+import { useT } from "@/lib/i18n";
 
 export default function RecipeDetailPage() {
   const params = useParams();
@@ -46,8 +40,15 @@ export default function RecipeDetailPage() {
   const recipeId = params.id as string;
 
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+
+  const RECIPE_TYPES = [
+    { value: "omni", label: t("recipes.typeOmni") },
+    { value: "vegetarian", label: t("recipes.typeVegetarian") },
+    { value: "vegan", label: t("recipes.typeVegan") },
+  ];
 
   if (!data) {
     return (
@@ -64,9 +65,9 @@ export default function RecipeDetailPage() {
       <div className="p-6">
         <Button variant="ghost" onClick={() => router.push("/recipes/recipes")} className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
-          Back to Recipes
+          {t("common.backToRecipes")}
         </Button>
-        <p className="text-muted-foreground">Recipe not found</p>
+        <p className="text-muted-foreground">{t("common.recipeNotFound")}</p>
       </div>
     );
   }
@@ -170,7 +171,7 @@ export default function RecipeDetailPage() {
         recipes: d.data.recipes.filter((r) => r.id !== recipeId),
       },
     }));
-    toast.success("Recipe deleted");
+    toast.success(t("recipes.toastDeleted"));
     router.push("/recipes/recipes");
   };
 
@@ -285,13 +286,13 @@ export default function RecipeDetailPage() {
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.push("/recipes/recipes")} className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
-          Back to Recipes
+          {t("common.backToRecipes")}
         </Button>
         <h1 className="text-3xl font-bold mb-2">
-          {recipe.translations.en.title || "Untitled Recipe"}
+          {recipe.translations.en.title || t("recipes.untitledRecipe")}
         </h1>
         <p className="text-muted-foreground">
-          Edit recipe details, ingredients, and instructions
+          {t("recipes.editSubtitle")}
         </p>
       </div>
 
@@ -299,12 +300,12 @@ export default function RecipeDetailPage() {
         {/* Basic Info */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Basic Information</CardTitle>
+            <CardTitle className="text-lg">{t("recipes.basicInfo")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2 max-w-xs">
               <Label>
-                Type
+                {t("recipes.typeSelectLabel")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <Select
@@ -331,21 +332,21 @@ export default function RecipeDetailPage() {
             />
 
             <MultiLanguageInput
-              label="Recipe Title"
+              label={t("recipes.recipeTitle")}
               value={recipe.translations}
               field="title"
               onChange={(lang, value) => updateRecipeTranslation(lang, "title", value)}
-              placeholder="Enter recipe title"
+              placeholder={t("recipes.recipeTitlePlaceholder")}
               required
               selectedLanguage={selectedLanguage}
             />
 
             <MultiLanguageTextarea
-              label="Description"
+              label={t("about.descriptionLabel")}
               value={recipe.translations}
               field="description"
               onChange={(lang, value) => updateRecipeTranslation(lang, "description", value)}
-              placeholder="Enter recipe description"
+              placeholder={t("recipes.recipeDescPlaceholder")}
               rows={3}
               selectedLanguage={selectedLanguage}
             />
@@ -356,10 +357,10 @@ export default function RecipeDetailPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Ingredients</CardTitle>
+              <CardTitle className="text-lg">{t("recipes.ingredients")}</CardTitle>
               <Button variant="outline" size="sm" onClick={addIngredient} className="gap-1">
                 <Plus className="h-3 w-3" />
-                Add Ingredient
+                {t("recipes.addIngredient")}
               </Button>
             </div>
           </CardHeader>
@@ -367,7 +368,7 @@ export default function RecipeDetailPage() {
             <Alert className="mb-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Ingredient amounts should be entered for 10 persons. The app will automatically scale for other group sizes.
+                {t("recipes.ingredientsNote")}
               </AlertDescription>
             </Alert>
             <LanguageSelector
@@ -377,10 +378,10 @@ export default function RecipeDetailPage() {
             />
             {recipe.ingredients.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg">
-                <p className="text-sm">No ingredients yet</p>
+                <p className="text-sm">{t("recipes.noIngredients")}</p>
                 <Button variant="outline" size="sm" onClick={addIngredient} className="mt-3 gap-1">
                   <Plus className="h-3 w-3" />
-                  Add First Ingredient
+                  {t("recipes.addFirstIngredient")}
                 </Button>
               </div>
             ) : (
@@ -396,7 +397,7 @@ export default function RecipeDetailPage() {
                     <div className="w-20">
                       <Input
                         type="number"
-                        placeholder="Amt"
+                        placeholder={t("recipes.amountPlaceholder")}
                         value={ingredient.amount ?? ""}
                         onChange={(e) =>
                           updateIngredient(ingredient.id, {
@@ -407,7 +408,7 @@ export default function RecipeDetailPage() {
                     </div>
                     <div className="w-24">
                       <Input
-                        placeholder="Unit"
+                        placeholder={t("recipes.unitPlaceholder")}
                         value={ingredient.translations[selectedLanguage]?.unit || ""}
                         onChange={(e) =>
                           updateIngredientTranslation(ingredient.id, selectedLanguage, "unit", e.target.value)
@@ -416,7 +417,7 @@ export default function RecipeDetailPage() {
                     </div>
                     <div className="flex-1">
                       <Input
-                        placeholder="Ingredient name"
+                        placeholder={t("recipes.ingredientNamePlaceholder")}
                         value={ingredient.translations[selectedLanguage]?.name || ""}
                         onChange={(e) =>
                           updateIngredientTranslation(ingredient.id, selectedLanguage, "name", e.target.value)
@@ -441,7 +442,7 @@ export default function RecipeDetailPage() {
         {/* Spices */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Spices</CardTitle>
+            <CardTitle className="text-lg">{t("recipes.spices")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <LanguageSelector
@@ -461,10 +462,10 @@ export default function RecipeDetailPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Cooking Instructions</CardTitle>
+              <CardTitle className="text-lg">{t("recipes.instructions")}</CardTitle>
               <Button variant="outline" size="sm" onClick={addInstructionStep} className="gap-1">
                 <Plus className="h-3 w-3" />
-                Add Step
+                {t("recipes.addStep")}
               </Button>
             </div>
           </CardHeader>
@@ -476,10 +477,10 @@ export default function RecipeDetailPage() {
             />
             {recipe.translations[selectedLanguage].instructions.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg">
-                <p className="text-sm">No instruction steps yet</p>
+                <p className="text-sm">{t("recipes.noInstructions")}</p>
                 <Button variant="outline" size="sm" onClick={addInstructionStep} className="mt-3 gap-1">
                   <Plus className="h-3 w-3" />
-                  Add First Step
+                  {t("recipes.addFirstStep")}
                 </Button>
               </div>
             ) : (
@@ -494,7 +495,7 @@ export default function RecipeDetailPage() {
                     </span>
                     <textarea
                       className="flex-1 min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      placeholder={`Step ${index + 1}`}
+                      placeholder={t("recipes.stepPlaceholder", { index: index + 1 })}
                       value={step}
                       onChange={(e) => updateInstructionStep(selectedLanguage, index, e.target.value)}
                     />
@@ -516,14 +517,14 @@ export default function RecipeDetailPage() {
         {/* Delete */}
         <Card className="border-destructive/50">
           <CardHeader>
-            <CardTitle className="text-lg text-destructive">Danger Zone</CardTitle>
+            <CardTitle className="text-lg text-destructive">{t("recipes.dangerZone")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Delete this recipe</p>
+                <p className="font-medium">{t("recipes.deleteThisRecipe")}</p>
                 <p className="text-sm text-muted-foreground">
-                  This action cannot be undone.
+                  {t("recipes.deleteCannotUndo")}
                 </p>
               </div>
               <Button
@@ -532,7 +533,7 @@ export default function RecipeDetailPage() {
                 className="gap-2"
               >
                 <Trash2 className="h-4 w-4" />
-                Delete Recipe
+                {t("recipes.deleteRecipe")}
               </Button>
             </div>
           </CardContent>
@@ -543,18 +544,18 @@ export default function RecipeDetailPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Recipe?</AlertDialogTitle>
+            <AlertDialogTitle>{t("recipes.deleteRecipeTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this recipe and all its ingredients. This action cannot be undone.
+              {t("recipes.deleteRecipeDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={deleteRecipe}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Recipe
+              {t("recipes.deleteRecipe")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -574,6 +575,7 @@ function SpicesEditor({
   selectedLanguage: LanguageCode;
 }) {
   const [newSpice, setNewSpice] = useState("");
+  const { t } = useT();
 
   const addSpice = () => {
     if (newSpice.trim()) {
@@ -590,7 +592,7 @@ function SpicesEditor({
     <div className="space-y-3">
       <div className="flex gap-2">
         <Input
-          placeholder="Add spice..."
+          placeholder={t("recipes.addSpicePlaceholder")}
           value={newSpice}
           onChange={(e) => setNewSpice(e.target.value)}
           onKeyDown={(e) => {
@@ -611,7 +613,7 @@ function SpicesEditor({
       </div>
       <div className="space-y-1 min-h-[80px]">
         {spices[selectedLanguage].length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">No spices added</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t("recipes.noSpices")}</p>
         ) : (
           spices[selectedLanguage].map((spice, index) => (
             <div

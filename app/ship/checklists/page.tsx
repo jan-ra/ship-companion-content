@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { generateId } from "@/lib/json-utils";
 import { getIconSvg, toKebabCase } from "@/lib/material-icons";
 import type { LanguageCode, ChecklistCategory, CheckItem } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
   const svg = getIconSvg(name);
@@ -38,6 +39,7 @@ function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
 
 export default function ChecklistsPage() {
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(null);
   const [openItem, setOpenItem] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
@@ -77,11 +79,11 @@ export default function ChecklistsPage() {
     }));
 
     setSelectedChecklistId(newChecklist.id);
-    toast.success("New checklist created");
+    toast.success(t("checklists.toastChecklistCreated"));
   };
 
   const deleteChecklist = (id: string) => {
-    if (confirm("Are you sure you want to delete this checklist and all its items?")) {
+    if (confirm(t("checklists.deleteChecklistConfirm"))) {
       updateData((d) => ({
         ...d,
         data: {
@@ -93,7 +95,7 @@ export default function ChecklistsPage() {
       if (selectedChecklistId === id) {
         setSelectedChecklistId(null);
       }
-      toast.success("Checklist deleted");
+      toast.success(t("checklists.toastChecklistDeleted"));
     }
   };
 
@@ -158,11 +160,11 @@ export default function ChecklistsPage() {
     }));
 
     setOpenItem(newTask.id);
-    toast.success("New task added");
+    toast.success(t("checklists.toastTaskAdded"));
   };
 
   const deleteTask = (checklistId: string, taskId: string) => {
-    if (confirm("Are you sure you want to delete this task?")) {
+    if (confirm(t("checklists.deleteTaskConfirm"))) {
       updateData((d) => ({
         ...d,
         data: {
@@ -174,7 +176,7 @@ export default function ChecklistsPage() {
           ),
         },
       }));
-      toast.success("Task deleted");
+      toast.success(t("checklists.toastTaskDeleted"));
     }
   };
 
@@ -217,24 +219,24 @@ export default function ChecklistsPage() {
       <div className="p-6 max-w-4xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Checklists</h1>
+            <h1 className="text-3xl font-bold mb-2">{t("checklists.title")}</h1>
             <p className="text-muted-foreground">
-              Manage checklist categories ({checklists.length} checklists)
+              {t("checklists.subtitle", { count: checklists.length })}
             </p>
           </div>
           <Button onClick={addChecklist} className="gap-2">
             <Plus className="h-4 w-4" />
-            Add Checklist
+            {t("checklists.addChecklist")}
           </Button>
         </div>
 
         {checklists.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <p className="text-muted-foreground mb-4">No checklists yet</p>
+              <p className="text-muted-foreground mb-4">{t("checklists.noChecklists")}</p>
               <Button onClick={addChecklist} className="gap-2">
                 <Plus className="h-4 w-4" />
-                Create First Checklist
+                {t("checklists.createFirst")}
               </Button>
             </CardContent>
           </Card>
@@ -252,10 +254,10 @@ export default function ChecklistsPage() {
                       className="flex-1 text-left"
                     >
                       <div className="font-medium">
-                        {checklist.translations.en.title || "Untitled Checklist"}
+                        {checklist.translations.en.title || t("checklists.untitledChecklist")}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {checklist.tasks.length} tasks
+                        {t("checklists.taskCount", { count: checklist.tasks.length })}
                         {checklist.translations.en.description && (
                           <> · {checklist.translations.en.description}</>
                         )}
@@ -300,15 +302,15 @@ export default function ChecklistsPage() {
           className="gap-2 mb-4 -ml-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Checklists
+          {t("checklists.backToChecklists")}
         </Button>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
-              {selectedChecklist.translations.en.title || "Untitled Checklist"}
+              {selectedChecklist.translations.en.title || t("checklists.untitledChecklist")}
             </h1>
             <p className="text-muted-foreground">
-              Edit checklist details and manage tasks ({selectedChecklist.tasks.length} tasks)
+              {t("checklists.editSubtitle", { count: selectedChecklist.tasks.length })}
             </p>
           </div>
           <Button
@@ -317,7 +319,7 @@ export default function ChecklistsPage() {
             className="gap-2"
           >
             <Trash2 className="h-4 w-4" />
-            Delete Checklist
+            {t("checklists.deleteChecklist")}
           </Button>
         </div>
       </div>
@@ -332,7 +334,7 @@ export default function ChecklistsPage() {
                 <MaterialIconSelector
                   value={selectedChecklist.icon}
                   onChange={(icon) => updateChecklist(selectedChecklist.id, { icon })}
-                  label="Checklist Icon"
+                  label={t("checklists.checklistIcon")}
                 />
               </div>
             </div>
@@ -374,20 +376,20 @@ export default function ChecklistsPage() {
         {/* Tasks Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Tasks</h2>
+            <h2 className="text-xl font-semibold">{t("checklists.tasks")}</h2>
             <Button onClick={() => addTask(selectedChecklist.id)} className="gap-2">
               <Plus className="h-4 w-4" />
-              Add Task
+              {t("checklists.addTask")}
             </Button>
           </div>
 
           {selectedChecklist.tasks.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <p className="text-muted-foreground mb-4">No tasks in this checklist</p>
+                <p className="text-muted-foreground mb-4">{t("checklists.noTasks")}</p>
                 <Button onClick={() => addTask(selectedChecklist.id)} className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Add First Task
+                  {t("checklists.addFirstTask")}
                 </Button>
               </CardContent>
             </Card>
@@ -402,7 +404,7 @@ export default function ChecklistsPage() {
                           {index + 1}.
                         </span>
                         <span className="font-medium">
-                          {task.translations.en.title || `Task ${index + 1}`}
+                          {task.translations.en.title || t("checklists.taskFallback", { index: index + 1 })}
                         </span>
                       </div>
                     </AccordionTrigger>
@@ -458,7 +460,7 @@ export default function ChecklistsPage() {
                             className="gap-2"
                           >
                             <Trash2 className="h-4 w-4" />
-                            Delete Task
+                            {t("checklists.deleteTask")}
                           </Button>
                         </div>
                       </CardContent>

@@ -24,21 +24,23 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-const navigation = [
-  { title: "About", href: "/ship/about", icon: FileText },
-  { title: "Cabin Plan", href: "/ship/occupancy", icon: BedDouble },
-  { title: "Checklists", href: "/ship/checklists", icon: CheckSquare },
-  { title: "FAQ", href: "/ship/faq", icon: HelpCircle },
-  { title: "Contact Details", href: "/ship/contact", icon: Contact },
-  { title: "Links", href: "/ship/links", icon: LinkIcon },
-  { title: "Cities", href: "/maps/cities", icon: MapPin },
-  { title: "Recipes", href: "/recipes/recipes", icon: UtensilsCrossed },
-  { title: "General", href: "/general", icon: Settings },
-];
+import { useT } from "@/lib/i18n";
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { t } = useT();
+
+  const navigation = [
+    { title: t("nav.about"), href: "/ship/about", icon: FileText },
+    { title: t("nav.cabinPlan"), href: "/ship/occupancy", icon: BedDouble },
+    { title: t("nav.checklists"), href: "/ship/checklists", icon: CheckSquare },
+    { title: t("nav.faq"), href: "/ship/faq", icon: HelpCircle },
+    { title: t("nav.contactDetails"), href: "/ship/contact", icon: Contact },
+    { title: t("nav.links"), href: "/ship/links", icon: LinkIcon },
+    { title: t("nav.cities"), href: "/maps/cities", icon: MapPin },
+    { title: t("nav.recipes"), href: "/recipes/recipes", icon: UtensilsCrossed },
+    { title: t("nav.general"), href: "/general", icon: Settings },
+  ];
 
   return (
     <Sidebar>
@@ -46,7 +48,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel className="text-lg font-semibold flex items-center gap-2">
             <Anchor className="h-5 w-5" />
-            Ship Companion Editor
+            {t("app.sidebarLabel")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

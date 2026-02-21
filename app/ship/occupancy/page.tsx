@@ -29,9 +29,11 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2, Bed, Edit2, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Cabin, LanguageCode } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export default function OccupancyPage() {
   const { data, updateData, getImageUrl, hasImage } = useAppDataStore();
+  const { t } = useT();
   const [selectedCabinNr, setSelectedCabinNr] = useState<number | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [deleteConfirmCabinNr, setDeleteConfirmCabinNr] = useState<number | null>(null);
@@ -70,7 +72,7 @@ export default function OccupancyPage() {
   const addCabin = () => {
     // Check if cabin number already exists
     if (cabins.some((c) => c.cabinNr === newCabin.cabinNr)) {
-      toast.error(`Cabin ${newCabin.cabinNr} already exists`);
+      toast.error(t("occupancy.toastCabinExists", { number: newCabin.cabinNr }));
       return;
     }
 
@@ -98,7 +100,7 @@ export default function OccupancyPage() {
     setIsAddDialogOpen(false);
     setSelectedCabinNr(newCabin.cabinNr);
     setNewCabin({ cabinNr: getNextCabinNr() + 1, posTop: 100, posLeft: 100, beds: 2 });
-    toast.success(`Cabin ${cabin.cabinNr} added`);
+    toast.success(t("occupancy.toastCabinAdded", { number: cabin.cabinNr }));
   };
 
   // Delete cabin
@@ -115,7 +117,7 @@ export default function OccupancyPage() {
       setSelectedCabinNr(null);
     }
     setDeleteConfirmCabinNr(null);
-    toast.success(`Cabin ${cabinNr} deleted`);
+    toast.success(t("occupancy.toastCabinDeleted", { number: cabinNr }));
   };
 
   // Update cabin
@@ -123,7 +125,7 @@ export default function OccupancyPage() {
     // If updating cabin number, check for duplicates
     if (updates.cabinNr !== undefined && updates.cabinNr !== cabinNr) {
       if (cabins.some((c) => c.cabinNr === updates.cabinNr)) {
-        toast.error(`Cabin ${updates.cabinNr} already exists`);
+        toast.error(t("occupancy.toastCabinExists", { number: updates.cabinNr }));
         return;
       }
       // Update selected cabin to the new number
@@ -166,9 +168,9 @@ export default function OccupancyPage() {
     <div className="p-6 max-w-6xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Cabin Plan</h1>
+          <h1 className="text-3xl font-bold mb-2">{t("occupancy.title")}</h1>
           <p className="text-muted-foreground">
-            {cabins.length} cabins · {totalBeds} beds
+            {t("occupancy.subtitle", { cabins: cabins.length, beds: totalBeds })}
           </p>
         </div>
         <Button
@@ -179,7 +181,7 @@ export default function OccupancyPage() {
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
-          Add Cabin
+          {t("occupancy.addCabin")}
         </Button>
       </div>
 
@@ -187,7 +189,7 @@ export default function OccupancyPage() {
         {/* Visual Layout */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Ship Layout</CardTitle>
+            <CardTitle className="text-lg">{t("occupancy.shipLayout")}</CardTitle>
           </CardHeader>
           <CardContent>
             {hasLayoutImage && layoutImageUrl ? (
@@ -234,8 +236,8 @@ export default function OccupancyPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                <p>No layout image found</p>
-                <p className="text-sm">Upload &quot;layout.png&quot; to display the ship layout</p>
+                <p>{t("occupancy.noLayoutImage")}</p>
+                <p className="text-sm">{t("occupancy.noLayoutHint")}</p>
               </div>
             )}
           </CardContent>
@@ -249,7 +251,7 @@ export default function OccupancyPage() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <Bed className="h-5 w-5" />
-                    Cabin {selectedCabin.cabinNr}
+                    {t("occupancy.cabinTitle", { number: selectedCabin.cabinNr })}
                   </CardTitle>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="sm" onClick={() => setSelectedCabinNr(null)}>
@@ -262,7 +264,7 @@ export default function OccupancyPage() {
                 {/* Cabin Settings */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Cabin Number</Label>
+                    <Label>{t("occupancy.cabinNumber")}</Label>
                     <Input
                       type="number"
                       min={1}
@@ -271,7 +273,7 @@ export default function OccupancyPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Beds</Label>
+                    <Label>{t("occupancy.beds")}</Label>
                     <Input
                       type="number"
                       min={1}
@@ -283,7 +285,7 @@ export default function OccupancyPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Position Top</Label>
+                    <Label>{t("occupancy.positionTop")}</Label>
                     <Input
                       type="number"
                       value={selectedCabin.posTop}
@@ -291,7 +293,7 @@ export default function OccupancyPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Position Left</Label>
+                    <Label>{t("occupancy.positionLeft")}</Label>
                     <Input
                       type="number"
                       value={selectedCabin.posLeft}
@@ -320,7 +322,7 @@ export default function OccupancyPage() {
                     className="gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Delete Cabin
+                    {t("occupancy.deleteCabin")}
                   </Button>
                 </div>
               </CardContent>
@@ -328,12 +330,12 @@ export default function OccupancyPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">All Cabins</CardTitle>
+                <CardTitle className="text-lg">{t("occupancy.allCabins")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {cabins.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>No cabins defined</p>
+                    <p>{t("occupancy.noCabins")}</p>
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -343,7 +345,7 @@ export default function OccupancyPage() {
                       className="mt-4 gap-2"
                     >
                       <Plus className="h-4 w-4" />
-                      Add First Cabin
+                      {t("occupancy.addFirstCabin")}
                     </Button>
                   </div>
                 ) : (
@@ -359,9 +361,9 @@ export default function OccupancyPage() {
                             {cabin.cabinNr}
                           </div>
                           <div>
-                            <div className="font-medium">Cabin {cabin.cabinNr}</div>
+                            <div className="font-medium">{t("occupancy.cabinTitle", { number: cabin.cabinNr })}</div>
                             <div className="text-sm text-muted-foreground">
-                              {cabin.beds} beds · Position: ({cabin.posLeft}, {cabin.posTop})
+                              {t("occupancy.bedsPosition", { beds: cabin.beds, left: cabin.posLeft, top: cabin.posTop })}
                             </div>
                           </div>
                         </div>
@@ -380,13 +382,13 @@ export default function OccupancyPage() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Cabin</DialogTitle>
-            <DialogDescription>Create a new cabin with its position on the layout.</DialogDescription>
+            <DialogTitle>{t("occupancy.addCabinTitle")}</DialogTitle>
+            <DialogDescription>{t("occupancy.addCabinDesc")}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="cabinNr">Cabin Number</Label>
+                <Label htmlFor="cabinNr">{t("occupancy.cabinNumber")}</Label>
                 <Input
                   id="cabinNr"
                   type="number"
@@ -396,7 +398,7 @@ export default function OccupancyPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="beds">Number of Beds</Label>
+                <Label htmlFor="beds">{t("occupancy.numberOfBeds")}</Label>
                 <Input
                   id="beds"
                   type="number"
@@ -409,7 +411,7 @@ export default function OccupancyPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="posTop">Position Top</Label>
+                <Label htmlFor="posTop">{t("occupancy.positionTop")}</Label>
                 <Input
                   id="posTop"
                   type="number"
@@ -418,7 +420,7 @@ export default function OccupancyPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="posLeft">Position Left</Label>
+                <Label htmlFor="posLeft">{t("occupancy.positionLeft")}</Label>
                 <Input
                   id="posLeft"
                   type="number"
@@ -430,9 +432,9 @@ export default function OccupancyPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
-            <Button onClick={addCabin}>Add Cabin</Button>
+            <Button onClick={addCabin}>{t("occupancy.addCabin")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -441,18 +443,18 @@ export default function OccupancyPage() {
       <AlertDialog open={deleteConfirmCabinNr !== null} onOpenChange={() => setDeleteConfirmCabinNr(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Cabin {deleteConfirmCabinNr}?</AlertDialogTitle>
+            <AlertDialogTitle>{t("occupancy.deleteCabinConfirm", { number: deleteConfirmCabinNr ?? "" })}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this cabin and remove all occupant assignments. This action cannot be undone.
+              {t("occupancy.deleteCabinDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteConfirmCabinNr !== null && deleteCabin(deleteConfirmCabinNr)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Cabin
+              {t("occupancy.deleteCabin")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

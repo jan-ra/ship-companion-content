@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useT } from "@/lib/i18n";
 
 interface ImageUploaderProps {
   value: string;
@@ -121,6 +122,7 @@ export function ImageUploader({
   const { addImage, removeImage, getImageUrl, hasImage } = useAppDataStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { t } = useT();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -128,13 +130,13 @@ export function ImageUploader({
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+      toast.error(t("imageUploader.selectImageError"));
       return;
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(`Image size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+      toast.error(t("imageUploader.fileSizeError", { size: MAX_FILE_SIZE / 1024 / 1024 }));
       return;
     }
 
@@ -153,10 +155,10 @@ export function ImageUploader({
         // If this is a multi-language uploader and no language has an image yet, set for all
         if (isMultiLanguage && !hasAnyLanguageImage && onSetAllLanguages) {
           onSetAllLanguages(filename);
-          toast.success("Image linked for all languages");
+          toast.success(t("imageUploader.linkedAllLanguages"));
         } else {
           onChange(filename);
-          toast.success("Image already exists, linked successfully");
+          toast.success(t("imageUploader.alreadyExists"));
         }
       } else {
         // Remove old image if replacing (only for this language)
@@ -170,16 +172,16 @@ export function ImageUploader({
         // If this is a multi-language uploader and no language has an image yet, set for all
         if (isMultiLanguage && !hasAnyLanguageImage && onSetAllLanguages) {
           onSetAllLanguages(filename);
-          toast.success("Image set for all languages");
+          toast.success(t("imageUploader.setAllLanguages"));
         } else {
           onChange(filename);
           const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-          toast.success(`Image converted to WebP (${sizeMB}MB)`);
+          toast.success(t("imageUploader.convertedWebP", { size: sizeMB }));
         }
       }
     } catch (error) {
       console.error("Image processing error:", error);
-      toast.error("Failed to process image");
+      toast.error(t("imageUploader.processingError"));
     } finally {
       setIsProcessing(false);
       // Reset input
@@ -199,7 +201,7 @@ export function ImageUploader({
         removeImage(value);
       }
       onChange("");
-      toast.success("Image removed");
+      toast.success(t("imageUploader.imageRemoved"));
     }
   };
 
@@ -211,7 +213,7 @@ export function ImageUploader({
       onRemoveAllLanguages();
     }
     setShowDeleteDialog(false);
-    toast.success("Image removed from all languages");
+    toast.success(t("imageUploader.imageRemovedAll"));
   };
 
   const imageUrl = value ? getImageUrl(value) : null;
@@ -243,7 +245,7 @@ export function ImageUploader({
                   className="gap-2 ml-2"
                 >
                   <X className="h-4 w-4" />
-                  Remove
+                  {t("imageUploader.remove")}
                 </Button>
               </div>
             </div>
@@ -255,7 +257,7 @@ export function ImageUploader({
             <div className="flex items-center gap-2 p-3 rounded-md bg-muted text-sm">
               <ImageIcon className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
-                Referenced: <code className="text-xs">{value}</code> (not found in images)
+                {t("imageUploader.referenced")} <code className="text-xs">{value}</code> {t("imageUploader.notFound")}
               </span>
               <Button
                 type="button"
@@ -286,18 +288,18 @@ export function ImageUploader({
             {isProcessing ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Processing...
+                {t("imageUploader.processing")}
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4" />
-                {value && !imageExists ? "Upload Image" : "Choose Image"}
+                {value && !imageExists ? t("imageUploader.uploadImage") : t("imageUploader.chooseImage")}
               </>
             )}
           </Button>
           {!value && !isProcessing && (
             <p className="text-xs text-muted-foreground">
-              JPG, PNG, GIF, WebP (max 2MB) · Auto-converted to WebP
+              {t("imageUploader.fileHint")}
             </p>
           )}
         </div>
@@ -306,19 +308,18 @@ export function ImageUploader({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove image from all languages?</AlertDialogTitle>
+            <AlertDialogTitle>{t("imageUploader.removeAllTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the image reference from all three languages (German, English, and
-              Dutch). This action cannot be undone.
+              {t("imageUploader.removeAllDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmRemove}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Remove from all languages
+              {t("imageUploader.removeFromAll")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -4,9 +4,11 @@ import { useAppDataStore } from "@/lib/store";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Anchor, FileJson, Ship, Map, UtensilsCrossed, Settings } from "lucide-react";
 import Link from "next/link";
+import { useT } from "@/lib/i18n";
 
 export default function Home() {
   const { data } = useAppDataStore();
+  const { t } = useT();
 
   if (!data) {
     return (
@@ -15,16 +17,16 @@ export default function Home() {
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
               <Anchor className="h-8 w-8" />
-              <CardTitle className="text-2xl">Welcome to Ship Companion Editor</CardTitle>
+              <CardTitle className="text-2xl">{t("dashboard.welcomeTitle")}</CardTitle>
             </div>
             <CardDescription>
-              Import an app-data.json file to start editing your ship companion content.
+              {t("dashboard.welcomeDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <FileJson className="h-4 w-4" />
-              <span>Use the Import JSON button in the header to get started</span>
+              <span>{t("dashboard.welcomeHint")}</span>
             </div>
           </CardContent>
         </Card>
@@ -34,44 +36,44 @@ export default function Home() {
 
   const sections = [
     {
-      title: "Ship Information",
-      description: "Manage ship details, about page, occupancy, checklists, FAQ, and contacts",
+      title: t("dashboard.shipInformation"),
+      description: t("dashboard.shipInformationDesc"),
       icon: Ship,
       href: "/ship/about",
       stats: [
-        { label: "Cabins", value: data.data.cabins.length },
-        { label: "Checklist Categories", value: data.data.checklists.length },
-        { label: "FAQ Questions", value: data.data.questions.length },
+        { label: t("dashboard.statCabins"), value: data.data.cabins.length },
+        { label: t("dashboard.statChecklistCategories"), value: data.data.checklists.length },
+        { label: t("dashboard.statFaqQuestions"), value: data.data.questions.length },
       ],
     },
     {
-      title: "Maps & Locations",
-      description: "Edit cities and points of interest",
+      title: t("dashboard.mapsLocations"),
+      description: t("dashboard.mapsLocationsDesc"),
       icon: Map,
       href: "/maps/cities",
       stats: [
-        { label: "Cities", value: data.data.cities.length },
-        { label: "Points of Interest", value: data.data.points.length },
+        { label: t("dashboard.statCities"), value: data.data.cities.length },
+        { label: t("dashboard.statPOI"), value: data.data.points.length },
       ],
     },
     {
-      title: "Recipes",
-      description: "Manage recipes and cooking schedules",
+      title: t("dashboard.recipes"),
+      description: t("dashboard.recipesDesc"),
       icon: UtensilsCrossed,
       href: "/recipes/recipes",
       stats: [
-        { label: "Total Recipes", value: data.data.recipes.length },
-        { label: "Favorites", value: data.data.recipes.filter((r) => r.isFavorite).length },
+        { label: t("dashboard.statTotalRecipes"), value: data.data.recipes.length },
+        { label: t("dashboard.statFavorites"), value: data.data.recipes.filter((r) => r.isFavorite).length },
       ],
     },
     {
-      title: "General Settings",
-      description: "Edit ship name, version, and metadata",
+      title: t("dashboard.generalSettings"),
+      description: t("dashboard.generalSettingsDesc"),
       icon: Settings,
       href: "/general",
       stats: [
-        { label: "Ship", value: data.shipName },
-        { label: "Version", value: data.version },
+        { label: t("dashboard.statShip"), value: data.shipName },
+        { label: t("dashboard.statVersion"), value: data.version },
       ],
     },
   ];
@@ -79,9 +81,9 @@ export default function Home() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("dashboard.title")}</h1>
         <p className="text-muted-foreground">
-          Overview of your Ship Companion content for {data.shipName}
+          {t("dashboard.subtitle", { shipName: data.shipName })}
         </p>
       </div>
 

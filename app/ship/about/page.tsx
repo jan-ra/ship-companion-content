@@ -16,6 +16,7 @@ import { Plus, Trash2, Ship, Anchor, History, Wrench, ImageIcon, Pencil, User } 
 import { getIconSvg, toKebabCase } from "@/lib/material-icons";
 import { toast } from "sonner";
 import type { LanguageCode } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 // Component to render a Material Icon from SVG
 function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
@@ -39,6 +40,7 @@ function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
 
 export default function AboutPage() {
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
   const [editingFactIndex, setEditingFactIndex] = useState<number | null>(null);
   const [editingEquipmentIndex, setEditingEquipmentIndex] = useState<number | null>(null);
@@ -95,7 +97,7 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("Fact added");
+    toast.success(t("about.toastFactAdded"));
   };
 
   const updateFact = (index: number, updates: any) => {
@@ -124,7 +126,7 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("Fact removed");
+    toast.success(t("about.toastFactRemoved"));
   };
 
   // History operations
@@ -149,7 +151,7 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("History step added");
+    toast.success(t("about.toastHistoryAdded"));
   };
 
   const updateHistoryStep = (index: number, lang: LanguageCode, field: "heading" | "text", value: string) => {
@@ -191,7 +193,7 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("History step removed");
+    toast.success(t("about.toastHistoryRemoved"));
   };
 
   // Equipment operations
@@ -217,7 +219,7 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("Equipment added");
+    toast.success(t("about.toastEquipmentAdded"));
   };
 
   const updateEquipment = (index: number, updates: any) => {
@@ -248,7 +250,7 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("Equipment removed");
+    toast.success(t("about.toastEquipmentRemoved"));
   };
 
   // Impressions operations
@@ -291,15 +293,15 @@ export default function AboutPage() {
         },
       },
     }));
-    toast.success("Impression removed");
+    toast.success(t("about.toastImpressionRemoved"));
   };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">About Page</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("about.title")}</h1>
         <p className="text-muted-foreground">
-          Edit ship about information, facts, history, and equipment
+          {t("about.subtitle")}
         </p>
       </div>
 
@@ -309,9 +311,9 @@ export default function AboutPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Ship className="h-5 w-5" />
-              Ship Description
+              {t("about.shipDescription")}
             </CardTitle>
-            <CardDescription>General ship description for each language</CardDescription>
+            <CardDescription>{t("about.shipDescriptionDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <LanguageSelector
@@ -320,12 +322,12 @@ export default function AboutPage() {
               className="max-w-xs"
             />
             <div className="space-y-2">
-              <Label>Description</Label>
+              <Label>{t("about.descriptionLabel")}</Label>
               <Textarea
                 value={about.translations[selectedLanguage]?.description || ""}
                 onChange={(e) => updateAboutTranslation(selectedLanguage, "description", e.target.value)}
                 rows={3}
-                placeholder="Enter ship description..."
+                placeholder={t("about.descriptionPlaceholder")}
               />
             </div>
           </CardContent>
@@ -336,9 +338,9 @@ export default function AboutPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Skipper
+              {t("about.skipper")}
             </CardTitle>
-            <CardDescription>Skipper vita and captain image caption</CardDescription>
+            <CardDescription>{t("about.skipperDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <LanguageSelector
@@ -347,20 +349,20 @@ export default function AboutPage() {
               className="max-w-xs"
             />
             <div className="space-y-2">
-              <Label>Vita</Label>
+              <Label>{t("about.vitaLabel")}</Label>
               <Textarea
                 value={about.translations[selectedLanguage]?.vita || ""}
                 onChange={(e) => updateAboutTranslation(selectedLanguage, "vita", e.target.value)}
                 rows={6}
-                placeholder="Enter skipper vita..."
+                placeholder={t("about.vitaPlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label>Captain Image Text</Label>
+              <Label>{t("about.captainImageLabel")}</Label>
               <Input
                 value={about.translations[selectedLanguage]?.captainImage || ""}
                 onChange={(e) => updateAboutTranslation(selectedLanguage, "captainImage", e.target.value)}
-                placeholder="Enter captain image caption..."
+                placeholder={t("about.captainImagePlaceholder")}
               />
             </div>
           </CardContent>
@@ -373,9 +375,9 @@ export default function AboutPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Anchor className="h-5 w-5" />
-                  Ship Facts
+                  {t("about.shipFacts")}
                 </CardTitle>
-                <CardDescription>Key facts about the ship ({about.facts.length} facts)</CardDescription>
+                <CardDescription>{t("about.shipFactsDesc", { count: about.facts.length })}</CardDescription>
               </div>
               <div className="flex items-center gap-2">
                 <LanguageSelector
@@ -385,7 +387,7 @@ export default function AboutPage() {
                 />
                 <Button onClick={addFact} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Fact
+                  {t("about.addFact")}
                 </Button>
               </div>
             </div>
@@ -393,10 +395,10 @@ export default function AboutPage() {
           <CardContent>
             {about.facts.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg">
-                <p className="text-sm">No facts yet</p>
+                <p className="text-sm">{t("about.noFacts")}</p>
                 <Button variant="outline" size="sm" onClick={addFact} className="mt-3 gap-1">
                   <Plus className="h-3 w-3" />
-                  Add First Fact
+                  {t("about.addFirstFact")}
                 </Button>
               </div>
             ) : (
@@ -414,7 +416,7 @@ export default function AboutPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] text-muted-foreground font-medium truncate leading-tight">
-                          {fact.translations[selectedLanguage]?.key || "Untitled"}
+                          {fact.translations[selectedLanguage]?.key || t("about.untitled")}
                         </div>
                         <div className="text-sm font-bold truncate leading-tight">
                           {fact.translations[selectedLanguage]?.value || "—"}
@@ -436,7 +438,7 @@ export default function AboutPage() {
         >
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Edit Fact</DialogTitle>
+              <DialogTitle>{t("about.editFact")}</DialogTitle>
             </DialogHeader>
             {editingFactIndex !== null && about.facts[editingFactIndex] && (() => {
               const fact = about.facts[editingFactIndex];
@@ -459,7 +461,7 @@ export default function AboutPage() {
 
                   <div className="space-y-3">
                     <div className="space-y-2">
-                      <Label>Key</Label>
+                      <Label>{t("about.keyLabel")}</Label>
                       <Input
                         value={fact.translations[selectedLanguage]?.key || ""}
                         onChange={(e) =>
@@ -473,11 +475,11 @@ export default function AboutPage() {
                             },
                           })
                         }
-                        placeholder="e.g., Length"
+                        placeholder={t("about.keyPlaceholder")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Value</Label>
+                      <Label>{t("about.valueLabel")}</Label>
                       <Input
                         value={fact.translations[selectedLanguage]?.value || ""}
                         onChange={(e) =>
@@ -491,7 +493,7 @@ export default function AboutPage() {
                             },
                           })
                         }
-                        placeholder="e.g., 40 meters"
+                        placeholder={t("about.valuePlaceholder")}
                       />
                     </div>
                   </div>
@@ -508,7 +510,7 @@ export default function AboutPage() {
                     className="w-full gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Remove Fact
+                    {t("about.removeFact")}
                   </Button>
                 </div>
               );
@@ -523,15 +525,15 @@ export default function AboutPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <History className="h-5 w-5" />
-                  History Timeline
+                  {t("about.historyTimeline")}
                 </CardTitle>
                 <CardDescription>
-                  Historical milestones ({about.history?.length || 0} steps)
+                  {t("about.historyTimelineDesc", { count: about.history?.length || 0 })}
                 </CardDescription>
               </div>
               <Button onClick={addHistoryStep} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Step
+                {t("about.addStep")}
               </Button>
             </div>
           </CardHeader>
@@ -544,7 +546,7 @@ export default function AboutPage() {
             {(about.history || []).map((step, index) => (
               <div key={index} className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Step #{index + 1}</span>
+                  <span className="font-medium">{t("about.stepHeading", { index: index + 1 })}</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -556,24 +558,24 @@ export default function AboutPage() {
 
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    <Label>Heading</Label>
+                    <Label>{t("about.headingLabel")}</Label>
                     <Input
                       value={step.translations[selectedLanguage]?.heading || ""}
                       onChange={(e) =>
                         updateHistoryStep(index, selectedLanguage, "heading", e.target.value)
                       }
-                      placeholder="e.g., 1925 - Built"
+                      placeholder={t("about.headingPlaceholder")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Text</Label>
+                    <Label>{t("about.textLabel")}</Label>
                     <Textarea
                       value={step.translations[selectedLanguage]?.text || ""}
                       onChange={(e) =>
                         updateHistoryStep(index, selectedLanguage, "text", e.target.value)
                       }
                       rows={3}
-                      placeholder="Enter history text..."
+                      placeholder={t("about.textPlaceholder")}
                     />
                   </div>
                 </div>
@@ -589,10 +591,10 @@ export default function AboutPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Wrench className="h-5 w-5" />
-                  Equipment
+                  {t("about.equipment")}
                 </CardTitle>
                 <CardDescription>
-                  Ship equipment and amenities ({about.equipment?.length || 0} items)
+                  {t("about.equipmentDesc", { count: about.equipment?.length || 0 })}
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
@@ -603,7 +605,7 @@ export default function AboutPage() {
                 />
                 <Button onClick={addEquipment} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Equipment
+                  {t("about.addEquipment")}
                 </Button>
               </div>
             </div>
@@ -611,10 +613,10 @@ export default function AboutPage() {
           <CardContent>
             {(about.equipment || []).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg">
-                <p className="text-sm">No equipment yet</p>
+                <p className="text-sm">{t("about.noEquipment")}</p>
                 <Button variant="outline" size="sm" onClick={addEquipment} className="mt-3 gap-1">
                   <Plus className="h-3 w-3" />
-                  Add First Equipment
+                  {t("about.addFirstEquipment")}
                 </Button>
               </div>
             ) : (
@@ -632,7 +634,7 @@ export default function AboutPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] text-muted-foreground font-medium truncate leading-tight">
-                          {item.translations[selectedLanguage]?.name || "Untitled"}
+                          {item.translations[selectedLanguage]?.name || t("about.untitled")}
                         </div>
                         <div className="text-sm font-bold truncate leading-tight">
                           {item.translations[selectedLanguage]?.description || "—"}
@@ -654,7 +656,7 @@ export default function AboutPage() {
         >
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Edit Equipment</DialogTitle>
+              <DialogTitle>{t("about.editEquipment")}</DialogTitle>
             </DialogHeader>
             {editingEquipmentIndex !== null && (about.equipment || [])[editingEquipmentIndex] && (() => {
               const item = (about.equipment || [])[editingEquipmentIndex];
@@ -677,7 +679,7 @@ export default function AboutPage() {
 
                   <div className="space-y-3">
                     <div className="space-y-2">
-                      <Label>Name</Label>
+                      <Label>{t("about.nameLabel")}</Label>
                       <Input
                         value={item.translations[selectedLanguage]?.name || ""}
                         onChange={(e) =>
@@ -691,11 +693,11 @@ export default function AboutPage() {
                             },
                           })
                         }
-                        placeholder="e.g., Navigation System"
+                        placeholder={t("about.namePlaceholder")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Description</Label>
+                      <Label>{t("about.equipmentDescLabel")}</Label>
                       <Textarea
                         value={item.translations[selectedLanguage]?.description || ""}
                         onChange={(e) =>
@@ -710,7 +712,7 @@ export default function AboutPage() {
                           })
                         }
                         rows={2}
-                        placeholder="Enter equipment description..."
+                        placeholder={t("about.equipmentDescPlaceholder")}
                       />
                     </div>
                   </div>
@@ -727,7 +729,7 @@ export default function AboutPage() {
                     className="w-full gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Remove Equipment
+                    {t("about.removeEquipment")}
                   </Button>
                 </div>
               );
@@ -742,10 +744,10 @@ export default function AboutPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <ImageIcon className="h-5 w-5" />
-                  Impressions
+                  {t("about.impressions")}
                 </CardTitle>
                 <CardDescription>
-                  Gallery images for the about page ({about.impressions?.length || 0} images)
+                  {t("about.impressionsDesc", { count: about.impressions?.length || 0 })}
                 </CardDescription>
               </div>
             </div>
@@ -754,7 +756,7 @@ export default function AboutPage() {
             {(about.impressions || []).map((image, index) => (
               <div key={index} className="border rounded-lg p-4 space-y-2">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-sm">Image #{index + 1}</span>
+                  <span className="font-medium text-sm">{t("about.imageNumber", { index: index + 1 })}</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -773,7 +775,7 @@ export default function AboutPage() {
             <ImageUploader
               value=""
               onChange={(filename) => addImpression(filename)}
-              label="Add Impression"
+              label={t("about.addImpression")}
             />
           </CardContent>
         </Card>

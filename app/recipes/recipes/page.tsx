@@ -17,18 +17,20 @@ import {
 import { Plus, UtensilsCrossed, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import type { Recipe } from "@/lib/types";
-
-const RECIPE_TYPES = [
-  { value: "omni", label: "Omnivore" },
-  { value: "vegetarian", label: "Vegetarian" },
-  { value: "vegan", label: "Vegan" },
-];
+import { useT } from "@/lib/i18n";
 
 export default function RecipesPage() {
   const router = useRouter();
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
+
+  const RECIPE_TYPES = [
+    { value: "omni", label: t("recipes.typeOmni") },
+    { value: "vegetarian", label: t("recipes.typeVegetarian") },
+    { value: "vegan", label: t("recipes.typeVegan") },
+  ];
 
   if (!data) {
     return (
@@ -81,7 +83,7 @@ export default function RecipesPage() {
       },
     }));
 
-    toast.success("New recipe added");
+    toast.success(t("recipes.toastAdded"));
     router.push(`/recipes/recipes/${newId}`);
   };
 
@@ -90,30 +92,30 @@ export default function RecipesPage() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Recipes</h1>
+            <h1 className="text-3xl font-bold mb-2">{t("recipes.title")}</h1>
             <p className="text-muted-foreground">
-              Manage recipes, ingredients, and cooking instructions · {recipes.length} recipes
+              {t("recipes.subtitle", { count: recipes.length })}
             </p>
           </div>
           <Button onClick={addRecipe} className="gap-2">
             <Plus className="h-4 w-4" />
-            Add Recipe
+            {t("recipes.addRecipe")}
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">All Recipes</CardTitle>
+          <CardTitle className="text-lg">{t("recipes.allRecipes")}</CardTitle>
         </CardHeader>
         <CardContent>
           {recipes.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <UtensilsCrossed className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p>No recipes yet</p>
+              <p>{t("recipes.noRecipes")}</p>
               <Button onClick={addRecipe} variant="outline" className="mt-4 gap-2">
                 <Plus className="h-4 w-4" />
-                Add First Recipe
+                {t("recipes.addFirstRecipe")}
               </Button>
             </div>
           ) : (
@@ -122,7 +124,7 @@ export default function RecipesPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search recipes..."
+                    placeholder={t("recipes.searchPlaceholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -130,10 +132,10 @@ export default function RecipesPage() {
                 </div>
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by type" />
+                    <SelectValue placeholder={t("recipes.filterByType")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="all">{t("recipes.allTypes")}</SelectItem>
                     {RECIPE_TYPES.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
@@ -146,7 +148,7 @@ export default function RecipesPage() {
               <div className="space-y-2">
                 {filteredRecipes.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>No recipes match your search</p>
+                    <p>{t("recipes.noSearchResults")}</p>
                   </div>
                 ) : (
                   filteredRecipes.map((recipe) => (
@@ -158,11 +160,11 @@ export default function RecipesPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium truncate">
-                            {recipe.translations.en.title || `Recipe #${recipe.id.slice(-6)}`}
+                            {recipe.translations.en.title || t("recipes.recipeFallback", { id: recipe.id.slice(-6) })}
                           </span>
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {getRecipeTypeLabel(recipe.type)} · {recipe.ingredients.length} ingredients
+                          {getRecipeTypeLabel(recipe.type)} · {t("recipes.recipeIngredients", { count: recipe.ingredients.length })}
                         </div>
                       </div>
                       <ChevronRight className="h-5 w-5 text-muted-foreground" />

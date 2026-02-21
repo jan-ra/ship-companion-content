@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, X } from "lucide-react";
 import { MATERIAL_ICONS, toSnakeCase, toKebabCase, getIconSvg } from "@/lib/material-icons";
+import { useT } from "@/lib/i18n";
 
 interface MaterialIconSelectorProps {
   value: string;
@@ -37,6 +38,7 @@ function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
 export function MaterialIconSelector({ value, onChange, label }: MaterialIconSelectorProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const { t } = useT();
 
   // Filter icons based on search
   const filteredIcons = useMemo(() => {
@@ -73,7 +75,7 @@ export function MaterialIconSelector({ value, onChange, label }: MaterialIconSel
               <span>{displayValue}</span>
             </div>
           ) : (
-            <span className="text-muted-foreground">Select an icon...</span>
+            <span className="text-muted-foreground">{t("iconSelector.selectPlaceholder")}</span>
           )}
         </Button>
         {value && (
@@ -91,14 +93,14 @@ export function MaterialIconSelector({ value, onChange, label }: MaterialIconSel
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh]">
           <DialogHeader>
-            <DialogTitle>Select Material Icon</DialogTitle>
+            <DialogTitle>{t("iconSelector.dialogTitle")}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search icons..."
+                placeholder={t("iconSelector.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -107,7 +109,7 @@ export function MaterialIconSelector({ value, onChange, label }: MaterialIconSel
             </div>
 
             <div className="text-sm text-muted-foreground">
-              {filteredIcons.length} icons found
+              {t("iconSelector.iconsFound", { count: filteredIcons.length })}
             </div>
 
             <ScrollArea className="h-[400px] border rounded-md">

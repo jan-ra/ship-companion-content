@@ -32,16 +32,7 @@ import { Plus, Trash2, ArrowLeft, Navigation, List, Map, Search } from "lucide-r
 import { toast } from "sonner";
 import { OpenStreetMap } from "@/components/openstreetmap";
 import type { LanguageCode, InterestPoint, PointType } from "@/lib/types";
-
-const POINT_TYPES: { value: PointType; label: string }[] = [
-  { value: "port", label: "Port" },
-  { value: "shop", label: "Shop" },
-  { value: "food", label: "Food & Dining" },
-  { value: "attraction", label: "Attraction" },
-  { value: "beach", label: "Beach" },
-  { value: "trash", label: "Trash/Disposal" },
-  { value: "shower", label: "Shower/Facilities" },
-];
+import { useT } from "@/lib/i18n";
 
 export default function CityPointsPage() {
   const params = useParams();
@@ -49,11 +40,22 @@ export default function CityPointsPage() {
   const cityId = parseInt(params.id as string);
 
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [selectedPointId, setSelectedPointId] = useState<number | null>(null);
   const [deletePointId, setDeletePointId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+
+  const POINT_TYPES: { value: PointType; label: string }[] = [
+    { value: "port", label: t("cities.pointTypePort") },
+    { value: "shop", label: t("cities.pointTypeShop") },
+    { value: "food", label: t("cities.pointTypeFood") },
+    { value: "attraction", label: t("cities.pointTypeAttraction") },
+    { value: "beach", label: t("cities.pointTypeBeach") },
+    { value: "trash", label: t("cities.pointTypeTrash") },
+    { value: "shower", label: t("cities.pointTypeShower") },
+  ];
 
   if (!data) {
     return (
@@ -72,9 +74,9 @@ export default function CityPointsPage() {
       <div className="p-6">
         <Button variant="ghost" onClick={() => router.push("/maps/cities")} className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
-          Back to Cities
+          {t("common.backToCities")}
         </Button>
-        <p className="text-muted-foreground">City not found</p>
+        <p className="text-muted-foreground">{t("common.cityNotFound")}</p>
       </div>
     );
   }
@@ -122,7 +124,7 @@ export default function CityPointsPage() {
     }));
 
     setSelectedPointId(newId);
-    toast.success("New point of interest added");
+    toast.success(t("cities.toastPointAdded"));
   };
 
   const removePoint = (id: number) => {
@@ -137,7 +139,7 @@ export default function CityPointsPage() {
     if (selectedPointId === id) {
       setSelectedPointId(null);
     }
-    toast.success("Point deleted");
+    toast.success(t("cities.toastPointDeleted"));
   };
 
   const updatePoint = (id: number, updates: Partial<InterestPoint>) => {
@@ -175,20 +177,20 @@ export default function CityPointsPage() {
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.push("/maps/cities")} className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
-          Back to Cities
+          {t("common.backToCities")}
         </Button>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
-              Points of Interest
+              {t("cities.pointsOfInterest")}
             </h1>
             <p className="text-muted-foreground">
-              {city.translations.en.name || `City #${cityId}`} · {cityPoints.length} points
+              {t("cities.pointsSubtitle", { cityName: city.translations.en.name || `City #${cityId}`, count: cityPoints.length })}
             </p>
           </div>
           <Button onClick={addPoint} className="gap-2">
             <Plus className="h-4 w-4" />
-            Add Point
+            {t("cities.addPoint")}
           </Button>
         </div>
       </div>
@@ -199,7 +201,7 @@ export default function CityPointsPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">All Points</CardTitle>
+                <CardTitle className="text-lg">{t("cities.allPoints")}</CardTitle>
                 <div className="flex gap-1 p-1 bg-muted rounded-lg">
                   <Button
                     variant={viewMode === "list" ? "default" : "ghost"}
@@ -208,7 +210,7 @@ export default function CityPointsPage() {
                     onClick={() => setViewMode("list")}
                   >
                     <List className="h-4 w-4" />
-                    <span className="text-sm">List</span>
+                    <span className="text-sm">{t("common.list")}</span>
                   </Button>
                   <Button
                     variant={viewMode === "map" ? "default" : "ghost"}
@@ -217,7 +219,7 @@ export default function CityPointsPage() {
                     onClick={() => setViewMode("map")}
                   >
                     <Map className="h-4 w-4" />
-                    <span className="text-sm">Map</span>
+                    <span className="text-sm">{t("common.map")}</span>
                   </Button>
                 </div>
               </div>
@@ -227,10 +229,10 @@ export default function CityPointsPage() {
                 cityPoints.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <Navigation className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                    <p>No points of interest yet</p>
+                    <p>{t("cities.noPoints")}</p>
                     <Button onClick={addPoint} variant="outline" className="mt-4 gap-2">
                       <Plus className="h-4 w-4" />
-                      Add First Point
+                      {t("cities.addFirstPoint")}
                     </Button>
                   </div>
                 ) : (
@@ -238,7 +240,7 @@ export default function CityPointsPage() {
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        placeholder="Search points..."
+                        placeholder={t("cities.searchPointsPlaceholder")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-9"
@@ -247,7 +249,7 @@ export default function CityPointsPage() {
                     <div className="space-y-2 max-h-[540px] overflow-y-auto">
                       {filteredPoints.length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
-                          <p>No points match your search</p>
+                          <p>{t("cities.noPointsSearch")}</p>
                         </div>
                       ) : filteredPoints.map((point) => (
                         <button
@@ -260,7 +262,7 @@ export default function CityPointsPage() {
                         >
                           <div className="flex-1 min-w-0">
                             <div className="font-medium truncate">
-                              {point.translations.en.name || `Point #${point.id}`}
+                              {point.translations.en.name || t("cities.pointFallback", { id: point.id })}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {getPointTypeLabel(point.type)}
@@ -292,8 +294,8 @@ export default function CityPointsPage() {
           <CardHeader>
             <CardTitle className="text-lg">
               {selectedPoint
-                ? selectedPoint.translations.en.name || `Point #${selectedPoint.id}`
-                : "Point Details"}
+                ? selectedPoint.translations.en.name || t("cities.pointFallback", { id: selectedPoint.id })
+                : t("cities.pointDetails")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -302,7 +304,7 @@ export default function CityPointsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>
-                      Type
+                      {t("cities.typeLabel")}
                       <span className="text-destructive ml-1">*</span>
                     </Label>
                     <Select
@@ -322,9 +324,9 @@ export default function CityPointsPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>City</Label>
+                    <Label>{t("cities.cityLabel")}</Label>
                     <Input
-                      value={city.translations.en.name || `City #${cityId}`}
+                      value={city.translations.en.name || t("cities.cityFallback", { id: cityId })}
                       disabled
                       className="bg-muted"
                     />
@@ -334,7 +336,7 @@ export default function CityPointsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>
-                      Latitude
+                      {t("cities.latitudeLabel")}
                       <span className="text-destructive ml-1">*</span>
                     </Label>
                     <Input
@@ -350,7 +352,7 @@ export default function CityPointsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>
-                      Longitude
+                      {t("cities.longitudeLabel")}
                       <span className="text-destructive ml-1">*</span>
                     </Label>
                     <Input
@@ -368,7 +370,7 @@ export default function CityPointsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Display Latitude (optional)</Label>
+                    <Label>{t("cities.displayLatLabel")}</Label>
                     <Input
                       type="number"
                       step="0.000001"
@@ -383,7 +385,7 @@ export default function CityPointsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Display Longitude (optional)</Label>
+                    <Label>{t("cities.displayLngLabel")}</Label>
                     <Input
                       type="number"
                       step="0.000001"
@@ -434,14 +436,14 @@ export default function CityPointsPage() {
                     className="gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Delete Point
+                    {t("cities.deletePoint")}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <Navigation className="h-12 w-12 mb-4 opacity-50" />
-                <p>Select a point to edit or add a new one</p>
+                <p>{t("cities.selectPointToEdit")}</p>
               </div>
             )}
           </CardContent>
@@ -452,18 +454,18 @@ export default function CityPointsPage() {
       <AlertDialog open={deletePointId !== null} onOpenChange={() => setDeletePointId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Point of Interest?</AlertDialogTitle>
+            <AlertDialogTitle>{t("cities.deletePointTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this point of interest. This action cannot be undone.
+              {t("cities.deletePointDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deletePointId !== null && removePoint(deletePointId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Point
+              {t("cities.deletePoint")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

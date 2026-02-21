@@ -14,9 +14,11 @@ import { Link as LinkIcon, ExternalLink, Plus, Trash2, ShoppingCart, Globe, Info
 import { toast } from "sonner";
 import { generateId } from "@/lib/json-utils";
 import type { LanguageCode, SupplyLink, AdditionalLink } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export default function LinksPage() {
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
 
   if (!data) {
@@ -55,7 +57,7 @@ export default function LinksPage() {
         },
       },
     }));
-    toast.success("Supply link added");
+    toast.success(t("links.toastSupplyAdded"));
   };
 
   const updateSupplyLink = (index: number, updates: Partial<SupplyLink>) => {
@@ -121,7 +123,7 @@ export default function LinksPage() {
         },
       },
     }));
-    toast.success("Supply link removed");
+    toast.success(t("links.toastSupplyRemoved"));
   };
 
   // Supply explanation
@@ -165,7 +167,7 @@ export default function LinksPage() {
         },
       },
     }));
-    toast.success("Link added");
+    toast.success(t("links.toastLinkAdded"));
   };
 
   const updateAdditionalLink = (index: number, updates: Partial<AdditionalLink>) => {
@@ -231,15 +233,15 @@ export default function LinksPage() {
         },
       },
     }));
-    toast.success("Link removed");
+    toast.success(t("links.toastLinkRemoved"));
   };
 
   return (
     <div className="p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">External Links</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("links.title")}</h1>
         <p className="text-muted-foreground">
-          Manage external website links and resources
+          {t("links.subtitle")}
         </p>
       </div>
 
@@ -249,16 +251,16 @@ export default function LinksPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Required Links</CardTitle>
-                <CardDescription>Core links that must be provided</CardDescription>
+                <CardTitle>{t("links.requiredLinks")}</CardTitle>
+                <CardDescription>{t("links.requiredLinksDesc")}</CardDescription>
               </div>
-              <Badge>Required</Badge>
+              <Badge>{t("links.required")}</Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="booking">
-                Booking Page
+                {t("links.bookingLabel")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <div className="flex items-center gap-2">
@@ -291,7 +293,7 @@ export default function LinksPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="privacy">
-                Privacy Policy
+                {t("links.privacyLabel")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <div className="flex items-center gap-2">
@@ -323,7 +325,7 @@ export default function LinksPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="shipLocation">Ship Location Tracker</Label>
+              <Label htmlFor="shipLocation">{t("links.shipLocationLabel")}</Label>
               <div className="flex items-center gap-2">
                 <LinkIcon className="h-4 w-4 text-muted-foreground" />
                 <Input
@@ -361,25 +363,27 @@ export default function LinksPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-5 w-5" />
-                  Additional Links
+                  {t("links.additionalLinks")}
                 </CardTitle>
                 <CardDescription>
-                  Extra links with translated names and descriptions ({additional.length} {additional.length === 1 ? "link" : "links"})
+                  {additional.length === 1
+                    ? t("links.additionalLinksDesc_one", { count: additional.length })
+                    : t("links.additionalLinksDesc_other", { count: additional.length })}
                 </CardDescription>
               </div>
               <Button onClick={addAdditionalLink} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Link
+                {t("links.addLink")}
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {additional.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg">
-                <p className="text-sm">No additional links yet</p>
+                <p className="text-sm">{t("links.noAdditionalLinks")}</p>
                 <Button variant="outline" size="sm" onClick={addAdditionalLink} className="mt-3 gap-1">
                   <Plus className="h-3 w-3" />
-                  Add First Link
+                  {t("links.addFirstLink")}
                 </Button>
               </div>
             ) : (
@@ -393,7 +397,7 @@ export default function LinksPage() {
                   <div key={link.id} className="border rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-sm">
-                        {link.translations[selectedLanguage]?.name || `Link #${index + 1}`}
+                        {link.translations[selectedLanguage]?.name || t("links.linkFallback", { index: index + 1 })}
                       </span>
                       <Button variant="ghost" size="sm" onClick={() => removeAdditionalLink(index)}>
                         <Trash2 className="h-4 w-4" />
@@ -401,7 +405,7 @@ export default function LinksPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>URL</Label>
+                      <Label>{t("links.urlLabel")}</Label>
                       <div className="flex items-center gap-2">
                         <LinkIcon className="h-4 w-4 text-muted-foreground" />
                         <Input
@@ -420,19 +424,17 @@ export default function LinksPage() {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <Label>Name</Label>
+                        <Label>{t("links.nameLabel")}</Label>
                         <Input
                           value={link.translations[selectedLanguage]?.name || ""}
                           onChange={(e) => updateAdditionalLinkTranslation(index, selectedLanguage, "name", e.target.value)}
-                          placeholder="e.g., Ship History"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Description</Label>
+                        <Label>{t("links.descriptionLabel")}</Label>
                         <Input
                           value={link.translations[selectedLanguage]?.description || ""}
                           onChange={(e) => updateAdditionalLinkTranslation(index, selectedLanguage, "description", e.target.value)}
-                          placeholder="e.g., Learn about our history"
                         />
                       </div>
                     </div>
@@ -450,15 +452,17 @@ export default function LinksPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5" />
-                  Supply Links
+                  {t("links.supplyLinks")}
                 </CardTitle>
                 <CardDescription>
-                  Links to suppliers for provisioning ({supplies.length} {supplies.length === 1 ? "link" : "links"})
+                  {supplies.length === 1
+                    ? t("links.supplyLinksDesc_one", { count: supplies.length })
+                    : t("links.supplyLinksDesc_other", { count: supplies.length })}
                 </CardDescription>
               </div>
               <Button onClick={addSupplyLink} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Supply Link
+                {t("links.addSupplyLink")}
               </Button>
             </div>
           </CardHeader>
@@ -466,7 +470,7 @@ export default function LinksPage() {
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                The supply button in the app is only displayed when at least one supply link is present.
+                {t("links.supplyButtonNote")}
               </AlertDescription>
             </Alert>
 
@@ -478,22 +482,22 @@ export default function LinksPage() {
 
             {/* Supply Explanation */}
             <div className="space-y-2">
-              <Label>Supply Explanation Text</Label>
+              <Label>{t("links.supplyExplanationLabel")}</Label>
               <Textarea
                 value={linksData.translations[selectedLanguage]?.supplyExplanation || ""}
                 onChange={(e) => updateSupplyExplanation(selectedLanguage, e.target.value)}
                 rows={4}
-                placeholder="Explain to guests how to pre-order supplies..."
+                placeholder={t("links.supplyExplanationPlaceholder")}
               />
             </div>
 
             {/* Supply Links List */}
             {supplies.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg">
-                <p className="text-sm">No supply links yet</p>
+                <p className="text-sm">{t("links.noSupplyLinks")}</p>
                 <Button variant="outline" size="sm" onClick={addSupplyLink} className="mt-3 gap-1">
                   <Plus className="h-3 w-3" />
-                  Add First Supply Link
+                  {t("links.addFirstSupplyLink")}
                 </Button>
               </div>
             ) : (
@@ -501,7 +505,7 @@ export default function LinksPage() {
                 <div key={index} className="border rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-sm">
-                      {supply.translations[selectedLanguage]?.name || `Supply #${index + 1}`}
+                      {supply.translations[selectedLanguage]?.name || t("links.supplyFallback", { index: index + 1 })}
                     </span>
                     <Button variant="ghost" size="sm" onClick={() => removeSupplyLink(index)}>
                       <Trash2 className="h-4 w-4" />
@@ -509,7 +513,7 @@ export default function LinksPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>URL</Label>
+                    <Label>{t("links.urlLabel")}</Label>
                     <div className="flex items-center gap-2">
                       <LinkIcon className="h-4 w-4 text-muted-foreground" />
                       <Input
@@ -528,19 +532,17 @@ export default function LinksPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label>Name</Label>
+                      <Label>{t("links.nameLabel")}</Label>
                       <Input
                         value={supply.translations[selectedLanguage]?.name || ""}
                         onChange={(e) => updateSupplyTranslation(index, selectedLanguage, "name", e.target.value)}
-                        placeholder="e.g., Albert Heijn"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Description</Label>
+                      <Label>{t("links.descriptionLabel")}</Label>
                       <Input
                         value={supply.translations[selectedLanguage]?.description || ""}
                         onChange={(e) => updateSupplyTranslation(index, selectedLanguage, "description", e.target.value)}
-                        placeholder="e.g., Online grocery delivery"
                       />
                     </div>
                   </div>

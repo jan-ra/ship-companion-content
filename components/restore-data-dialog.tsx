@@ -20,11 +20,13 @@ import {
   clearAllStorage,
 } from "@/lib/browser-storage";
 import { toast } from "sonner";
+import { useT } from "@/lib/i18n";
 
 export function RestoreDataDialog() {
   const [showDialog, setShowDialog] = useState(false);
   const [timestamp, setTimestamp] = useState<Date | null>(null);
   const { data, setData } = useAppDataStore();
+  const { t } = useT();
 
   useEffect(() => {
     // Only check on initial mount when there's no data loaded
@@ -45,19 +47,19 @@ export function RestoreDataDialog() {
       const storedImages = await loadImagesFromStorage();
       // Pass persistImages=false: images are already in IndexedDB, no need to clear and rewrite them
       setData(storedData, storedImages, false);
-      toast.success("Data restored from browser storage");
+      toast.success(t("restore.toastRestored"));
     }
     setShowDialog(false);
   };
 
   const handleDiscard = async () => {
     await clearAllStorage();
-    toast.info("Stored data discarded");
+    toast.info(t("restore.toastDiscarded"));
     setShowDialog(false);
   };
 
   const formatTimestamp = (date: Date | null) => {
-    if (!date) return "unknown time";
+    if (!date) return t("restore.unknownTime");
     return date.toLocaleString();
   };
 
@@ -65,22 +67,22 @@ export function RestoreDataDialog() {
     <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Restore Previous Session?</AlertDialogTitle>
+          <AlertDialogTitle>{t("restore.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Found unsaved data from a previous session
+            {t("restore.description")}
             {timestamp && (
               <span className="block mt-2 text-sm">
-                Last modified: {formatTimestamp(timestamp)}
+                {t("restore.lastModified", { timestamp: formatTimestamp(timestamp) })}
               </span>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleDiscard}>
-            Discard
+            {t("restore.discard")}
           </AlertDialogCancel>
           <AlertDialogAction onClick={handleRestore}>
-            Restore Data
+            {t("restore.restore")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

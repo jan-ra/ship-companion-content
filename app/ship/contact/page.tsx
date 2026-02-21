@@ -10,9 +10,11 @@ import { LanguageSelector } from "@/components/language-selector";
 import { Separator } from "@/components/ui/separator";
 import { Phone, Mail, Instagram, Facebook, Youtube } from "lucide-react";
 import type { LanguageCode } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export default function ContactPage() {
   const { data, updateData } = useAppDataStore();
+  const { t } = useT();
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
 
   if (!data) {
@@ -28,9 +30,9 @@ export default function ContactPage() {
   return (
     <div className="p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Contact Details</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("contact.title")}</h1>
         <p className="text-muted-foreground">
-          Manage contact information and social media links
+          {t("contact.subtitle")}
         </p>
       </div>
 
@@ -38,13 +40,13 @@ export default function ContactPage() {
         {/* Contact Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
-            <CardDescription>Phone and email contact details</CardDescription>
+            <CardTitle>{t("contact.contactInfo")}</CardTitle>
+            <CardDescription>{t("contact.contactInfoDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="phone">
-                Phone Number
+                {t("contact.phoneLabel")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <div className="flex items-center gap-2">
@@ -62,7 +64,7 @@ export default function ContactPage() {
                       },
                     }))
                   }
-                  placeholder="+31 123 456 789"
+                  placeholder={t("contact.phonePlaceholder")}
                   required
                 />
               </div>
@@ -70,7 +72,7 @@ export default function ContactPage() {
 
             <div className="space-y-2">
               <Label htmlFor="mail">
-                Email Address
+                {t("contact.emailLabel")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <div className="flex items-center gap-2">
@@ -88,7 +90,7 @@ export default function ContactPage() {
                       },
                     }))
                   }
-                  placeholder="contact@ship.com"
+                  placeholder={t("contact.emailPlaceholder")}
                   required
                 />
               </div>
@@ -99,12 +101,12 @@ export default function ContactPage() {
         {/* Social Media */}
         <Card>
           <CardHeader>
-            <CardTitle>Social Media</CardTitle>
-            <CardDescription>Optional social media profile links</CardDescription>
+            <CardTitle>{t("contact.socialMedia")}</CardTitle>
+            <CardDescription>{t("contact.socialMediaDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="instagram">Instagram</Label>
+              <Label htmlFor="instagram">{t("contact.instagramLabel")}</Label>
               <div className="flex items-center gap-2">
                 <Instagram className="h-4 w-4 text-muted-foreground" />
                 <Input
@@ -126,7 +128,7 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="facebook">Facebook</Label>
+              <Label htmlFor="facebook">{t("contact.facebookLabel")}</Label>
               <div className="flex items-center gap-2">
                 <Facebook className="h-4 w-4 text-muted-foreground" />
                 <Input
@@ -148,7 +150,7 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="youtube">YouTube</Label>
+              <Label htmlFor="youtube">{t("contact.youtubeLabel")}</Label>
               <div className="flex items-center gap-2">
                 <Youtube className="h-4 w-4 text-muted-foreground" />
                 <Input
@@ -176,8 +178,8 @@ export default function ContactPage() {
         {/* Multi-language Fields */}
         <Card>
           <CardHeader>
-            <CardTitle>Company & Skipper Information</CardTitle>
-            <CardDescription>Multi-language company and skipper details</CardDescription>
+            <CardTitle>{t("contact.companyAndSkipper")}</CardTitle>
+            <CardDescription>{t("contact.companyAndSkipperDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <LanguageSelector
