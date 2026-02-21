@@ -212,6 +212,7 @@ export interface AppData {
   exportDate: string;
   version: string;
   shipName: string;
+  appconf_folder_id?: string;
   data: {
     recipes: Recipe[];
     points: InterestPoint[];

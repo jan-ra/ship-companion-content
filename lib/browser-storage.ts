@@ -113,21 +113,26 @@ export async function saveImageToStorage(filename: string, blob: Blob): Promise<
  */
 export async function saveAllImagesToStorage(images: Map<string, Blob>): Promise<void> {
   try {
+    // Convert all blobs to ArrayBuffers BEFORE opening the transaction.
+    // IndexedDB transactions auto-commit when the event loop is idle, so we must
+    // not await anything inside the transaction (e.g. blob.arrayBuffer()).
+    const entries: Array<[string, ArrayBuffer, string]> = await Promise.all(
+      Array.from(images.entries()).map(async ([filename, blob]) => [
+        filename,
+        await blob.arrayBuffer(),
+        blob.type,
+      ])
+    );
+
     const db = await openImagesDB();
     const transaction = db.transaction(IMAGES_STORE_NAME, 'readwrite');
     const store = transaction.objectStore(IMAGES_STORE_NAME);
 
-    // Clear existing images
-    await new Promise<void>((resolve, reject) => {
-      const clearRequest = store.clear();
-      clearRequest.onerror = () => reject(clearRequest.error);
-      clearRequest.onsuccess = () => resolve();
-    });
+    store.clear();
 
-    // Add all images
-    for (const [filename, blob] of images.entries()) {
-      const arrayBuffer = await blob.arrayBuffer();
-      store.put({ data: arrayBuffer, type: blob.type }, filename);
+    // All puts are synchronous within the active transaction
+    for (const [filename, arrayBuffer, type] of entries) {
+      store.put({ data: arrayBuffer, type }, filename);
     }
 
     await new Promise<void>((resolve, reject) => {

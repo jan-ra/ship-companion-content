@@ -1,17 +1,29 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAppDataStore } from "@/lib/store";
 import { importAppConfFile, exportAppConfFile } from "@/lib/json-utils";
-import { Download, Upload, AlertCircle, Image } from "lucide-react";
+import { Download, Upload, AlertCircle, Image, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function AppHeader() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data, images, setData, hasUnsavedChanges } = useAppDataStore();
+  const [showFolderDialog, setShowFolderDialog] = useState(false);
+  const [folderUrl, setFolderUrl] = useState<string | null>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,6 +52,11 @@ export function AppHeader() {
     try {
       await exportAppConfFile(data, images);
       toast.success("File exported successfully as .appconf!");
+
+      if (data.appconf_folder_id) {
+        setFolderUrl(`https://drive.google.com/drive/folders/${data.appconf_folder_id}`);
+        setShowFolderDialog(true);
+      }
     } catch (error) {
       toast.error("Failed to export file: " + (error as Error).message);
     }
@@ -107,6 +124,29 @@ export function AppHeader() {
           </AlertDescription>
         </Alert>
       )}
+
+      <AlertDialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Open upload folder?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Do you want to open the Google Drive folder where you need to upload the exported file?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No, thanks</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (folderUrl) window.open(folderUrl, "_blank");
+              }}
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open folder
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 }

@@ -86,7 +86,7 @@ interface AppDataStore {
   hasUnsavedChanges: boolean;
 
   // Actions
-  setData: (data: AppData, images?: Map<string, Blob>) => void;
+  setData: (data: AppData, images?: Map<string, Blob>, persistImages?: boolean) => void;
   updateData: (updater: (data: AppData) => AppData) => void;
   clearData: () => void;
   markSaved: () => void;
@@ -104,7 +104,7 @@ export const useAppDataStore = create<AppDataStore>((set, get) => ({
   imageUrls: new Map(),
   hasUnsavedChanges: false,
 
-  setData: (data, images = new Map()) => {
+  setData: (data, images = new Map(), persistImages = true) => {
     // Clean up old object URLs
     const state = get();
     state.imageUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -121,7 +121,9 @@ export const useAppDataStore = create<AppDataStore>((set, get) => ({
 
     // Save to browser storage
     saveDataToStorage(normalized);
-    saveAllImagesToStorage(images);
+    if (persistImages) {
+      saveAllImagesToStorage(images);
+    }
   },
 
   updateData: (updater) => set((state) => {

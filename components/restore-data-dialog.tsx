@@ -43,7 +43,8 @@ export function RestoreDataDialog() {
     const storedData = loadDataFromStorage();
     if (storedData) {
       const storedImages = await loadImagesFromStorage();
-      setData(storedData, storedImages);
+      // Pass persistImages=false: images are already in IndexedDB, no need to clear and rewrite them
+      setData(storedData, storedImages, false);
       toast.success("Data restored from browser storage");
     }
     setShowDialog(false);
