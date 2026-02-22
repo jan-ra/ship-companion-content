@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamicParams = false;
+
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppDataStore } from "@/lib/store";
