@@ -18,8 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ship Companion Content Editor",
-  description: "Edit and manage Ship Companion app data",
+  title: "App Editor",
+  description: "Edit and manage app data",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({

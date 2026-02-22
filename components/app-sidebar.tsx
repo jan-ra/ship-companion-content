@@ -25,22 +25,44 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useT } from "@/lib/i18n";
+import { useAppDataStore } from "@/lib/store";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { t } = useT();
+  const data = useAppDataStore((s) => s.data);
 
-  const navigation = [
+  // Hide sidebar on start screen when no data is loaded
+  if (pathname === "/" && !data) {
+    return null;
+  }
+
+  const generalNav = [
+    { title: t("nav.general"), href: "/general", icon: Settings },
+  ];
+
+  const contentNav = [
     { title: t("nav.about"), href: "/ship/about", icon: FileText },
     { title: t("nav.cabinPlan"), href: "/ship/occupancy", icon: BedDouble },
     { title: t("nav.checklists"), href: "/ship/checklists", icon: CheckSquare },
     { title: t("nav.faq"), href: "/ship/faq", icon: HelpCircle },
     { title: t("nav.contactDetails"), href: "/ship/contact", icon: Contact },
     { title: t("nav.links"), href: "/ship/links", icon: LinkIcon },
-    { title: t("nav.cities"), href: "/maps/cities", icon: MapPin },
+    { title: t("nav.map"), href: "/maps/cities", icon: MapPin },
     { title: t("nav.recipes"), href: "/recipes/recipes", icon: UtensilsCrossed },
-    { title: t("nav.general"), href: "/general", icon: Settings },
   ];
+
+  const renderNavItems = (items: typeof generalNav) =>
+    items.map((item) => (
+      <SidebarMenuItem key={item.href}>
+        <SidebarMenuButton asChild isActive={pathname === item.href || pathname.startsWith(item.href + "/")}>
+          <Link href={item.href}>
+            <item.icon className="h-4 w-4" />
+            <span>{item.title}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    ));
 
   return (
     <Sidebar>
@@ -52,16 +74,15 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigation.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href || pathname.startsWith(item.href + "/")}>
-                    <Link href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {renderNavItems(generalNav)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>{t("nav.groupContent")}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {renderNavItems(contentNav)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

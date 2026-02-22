@@ -26,7 +26,7 @@ import { OpenStreetMap } from "@/components/openstreetmap";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Plus, Trash2, MapPin, Navigation, List, Map, Search, Info } from "lucide-react";
 import { toast } from "sonner";
-import { useDevMode } from "@/lib/preferences-store";
+import { useDevMode, useUiLanguage } from "@/lib/preferences-store";
 import type { LanguageCode, City } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
@@ -34,11 +34,12 @@ export default function CitiesPage() {
   const router = useRouter();
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
+  const uiLanguage = useUiLanguage();
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
   const [deleteCityId, setDeleteCityId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
   const devMode = useDevMode();
 
   if (!data) {
@@ -166,7 +167,7 @@ export default function CitiesPage() {
     : { lat: 52.5, lng: 5.5 };
 
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -263,7 +264,7 @@ export default function CitiesPage() {
                         >
                           <div className="flex-1 min-w-0">
                             <div className="font-medium truncate">
-                              {city.translations.en.name || t("cities.cityFallback", { id: city.id })}
+                              {city.translations[uiLanguage].name || city.translations.en.name || t("cities.cityFallback", { id: city.id })}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {cityPointCount !== 1 ? t("cities.cityPoiCount_other", { count: cityPointCount }) : t("cities.cityPoiCount_one", { count: cityPointCount })} · ({city.latitude.toFixed(2)}, {city.longitude.toFixed(2)})
@@ -303,43 +304,42 @@ export default function CitiesPage() {
           <CardContent>
             {selectedCity ? (
               <div className="space-y-6">
-                {devMode && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>
-                        {t("cities.latitudeLabel")}
-                        <span className="text-destructive ml-1">*</span>
-                      </Label>
-                      <Input
-                        type="number"
-                        step="0.000001"
-                        min="-180"
-                        max="180"
-                        value={selectedCity.latitude}
-                        onChange={(e) =>
-                          updateCity(selectedCity.id, { latitude: parseFloat(e.target.value) || 0 })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>
-                        {t("cities.longitudeLabel")}
-                        <span className="text-destructive ml-1">*</span>
-                      </Label>
-                      <Input
-                        type="number"
-                        step="0.000001"
-                        min="-180"
-                        max="180"
-                        value={selectedCity.longitude}
-                        onChange={(e) =>
-                          updateCity(selectedCity.id, { longitude: parseFloat(e.target.value) || 0 })
-                        }
-                      />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>
+                      {t("cities.latitudeLabel")}
+                      <span className="text-destructive ml-1">*</span>
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.000001"
+                      min="-180"
+                      max="180"
+                      value={selectedCity.latitude}
+                      onChange={(e) =>
+                        updateCity(selectedCity.id, { latitude: parseFloat(e.target.value) || 0 })
+                      }
+                    />
                   </div>
+                  <div className="space-y-2">
+                    <Label>
+                      {t("cities.longitudeLabel")}
+                      <span className="text-destructive ml-1">*</span>
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.000001"
+                      min="-180"
+                      max="180"
+                      value={selectedCity.longitude}
+                      onChange={(e) =>
+                        updateCity(selectedCity.id, { longitude: parseFloat(e.target.value) || 0 })
+                      }
+                    />
+                  </div>
+                </div>
 
+                {devMode && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>{t("cities.displayLatLabel")}</Label>
@@ -372,7 +372,9 @@ export default function CitiesPage() {
                       />
                     </div>
                   </div>
+                )}
 
+                {devMode && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>
@@ -406,8 +408,7 @@ export default function CitiesPage() {
                       </div>
                     </div>
                   </div>
-                </>
-              )}
+                )}
 
                 <LanguageSelector
                   value={selectedLanguage}

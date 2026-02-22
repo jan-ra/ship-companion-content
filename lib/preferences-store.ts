@@ -10,12 +10,13 @@ interface Preferences {
 }
 
 interface PreferencesStore extends Preferences {
+  _hydrated: boolean;
   setDevMode: (enabled: boolean) => void;
   setUiLanguage: (lang: LanguageCode) => void;
+  hydrate: () => void;
 }
 
 function loadPreferences(): Preferences {
-  if (typeof window === 'undefined') return { devMode: false, uiLanguage: 'en' };
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -39,8 +40,17 @@ function savePreferences(prefs: Preferences) {
   }
 }
 
+// Always start with SSR-safe defaults so server and client initial render match
+const SSR_DEFAULTS: Preferences = { devMode: false, uiLanguage: 'en' };
+
 export const usePreferencesStore = create<PreferencesStore>((set) => ({
-  ...loadPreferences(),
+  ...SSR_DEFAULTS,
+  _hydrated: false,
+
+  hydrate: () => {
+    const prefs = loadPreferences();
+    set({ ...prefs, _hydrated: true });
+  },
 
   setDevMode: (enabled) => set((state) => {
     const next = { ...state, devMode: enabled };

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- White background circle -->
+  <circle cx="50" cy="50" r="50" fill="#ffffff"/>
+  <!-- Ring at top -->
+  <circle cx="50" cy="18" r="10" fill="none" stroke="#000000" stroke-width="7"/>
+  <!-- Vertical shaft -->
+  <line x1="50" y1="28" x2="50" y2="82" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+  <!-- Horizontal crossbar -->
+  <line x1="28" y1="48" x2="72" y2="48" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+  <!-- Left arm -->
+  <path d="M50 82 Q30 78 22 65" fill="none" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+  <!-- Right arm -->
+  <path d="M50 82 Q70 78 78 65" fill="none" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+  <!-- Left tip -->
+  <circle cx="22" cy="65" r="5" fill="#000000"/>
+  <!-- Right tip -->
+  <circle cx="78" cy="65" r="5" fill="#000000"/>
+</svg>

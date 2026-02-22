@@ -1,7 +1,7 @@
 export const en = {
   app: {
-    title: 'Ship Companion Content Editor',
-    sidebarLabel: 'Ship Companion Editor',
+    title: 'App Editor',
+    sidebarLabel: 'App Editor',
   },
 
   header: {
@@ -10,7 +10,7 @@ export const en = {
     unsavedChanges: 'Unsaved Changes',
     image: 'image',
     images: 'images',
-    importAlert: 'Please import an .appconf file to get started. Use the Import button above.',
+    importAlert: 'No data loaded. Please import an .appconf file to get started.',
     openFolderTitle: 'Open upload folder?',
     openFolderDescription: 'Do you want to open the Google Drive folder where you need to upload the exported file?',
     openFolderCancel: 'No, thanks',
@@ -25,8 +25,11 @@ export const en = {
     contactDetails: 'Contact Details',
     links: 'Links',
     cities: 'Cities',
+    map: 'Map',
     recipes: 'Recipes',
     general: 'General',
+    groupGeneral: 'General',
+    groupContent: 'Content',
   },
 
   uiLanguage: {
@@ -72,10 +75,10 @@ export const en = {
 
   dashboard: {
     title: 'Dashboard',
-    subtitle: 'Overview of your Ship Companion content for {shipName}',
-    welcomeTitle: 'Welcome to Ship Companion Editor',
-    welcomeDescription: 'Import an app-data.json file to start editing your ship companion content.',
-    welcomeHint: 'Use the Import JSON button in the header to get started',
+    subtitle: 'Overview of your app content for {shipName}',
+    welcomeTitle: 'Welcome to App Editor',
+    welcomeDescription: 'Import an .appconf file to start editing your ship companion content.',
+    welcomeHint: 'You will receive an .appconf file from the developer.',
     shipInformation: 'Ship Information',
     shipInformationDesc: 'Manage ship details, about page, occupancy, checklists, FAQ, and contacts',
     mapsLocations: 'Maps & Locations',
@@ -97,7 +100,7 @@ export const en = {
 
   general: {
     title: 'General Settings',
-    subtitle: 'Manage general metadata and information about your ship companion app',
+    subtitle: 'Manage general metadata and information about your app',
     basicInfo: 'Basic Information',
     basicInfoDesc: 'Edit ship name and version',
     shipName: 'Ship Name',
@@ -129,6 +132,7 @@ export const en = {
     devModeLabel: 'Developer Mode',
     devModeOn: 'Advanced features are visible',
     devModeOff: 'Some features are hidden',
+    devModeRequired: 'Enable developer mode to edit this field',
     enableDevMode: 'Enable Developer Mode?',
     disableDevMode: 'Disable Developer Mode?',
     enableDevModeDesc: 'This will show advanced editing features that are normally hidden. Only enable this if you know what you are doing.',
@@ -245,6 +249,8 @@ export const en = {
     toastChecklistDeleted: 'Checklist deleted',
     toastTaskAdded: 'New task added',
     toastTaskDeleted: 'Task deleted',
+    infoTitle: 'About Checklists',
+    infoText: 'Checklists appear in the app as categories with tasks. Each checklist has an icon, a title, and a list of items guests can check off during their trip.',
   },
 
   faq: {
@@ -343,6 +349,10 @@ export const en = {
     toastCityAdded: 'New city added',
     toastCityDeleted: 'City deleted',
     selectCity: 'Select a city to edit or add a new one',
+    pasteFromMaps: 'Paste from Google Maps',
+    pasteFromMapsPlaceholder: 'e.g. 51.99648, 4.33775',
+    pasteFromMapsHint: 'In Google Maps, right-click a location and copy the coordinates, then paste them here.',
+    pasteFromMapsInvalid: 'Could not parse coordinates. Use format: 51.99648, 4.33775',
     pointsOfInterest: 'Points of Interest',
     pointsSubtitle: '{cityName} · {count} points',
     addPoint: 'Add Point',
@@ -387,6 +397,9 @@ export const en = {
     typeVegetarian: 'Vegetarian',
     typeVegan: 'Vegan',
     toastAdded: 'New recipe added',
+    deleteRecipeConfirm: 'Are you sure you want to delete this recipe?',
+    infoTitle: 'About Recipes',
+    infoText: 'Recipes are shown in the app with ingredients and step-by-step instructions. Ingredient amounts are automatically scaled for different group sizes.',
     backToRecipes: 'Back to Recipes',
     recipeNotFound: 'Recipe not found',
     untitledRecipe: 'Untitled Recipe',

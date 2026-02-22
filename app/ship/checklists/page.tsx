@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAppDataStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { MultiLanguageInput } from "@/components/multi-language-input";
@@ -11,12 +12,13 @@ import { MultiLanguageImageUploader } from "@/components/multi-language-image-up
 import { LanguageSelector } from "@/components/language-selector";
 import { MaterialIconSelector } from "@/components/material-icon-selector";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Trash2, ChevronRight, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, ChevronRight, ArrowLeft, Info } from "lucide-react";
 import { toast } from "sonner";
 import { generateId } from "@/lib/json-utils";
 import { getIconSvg, toKebabCase } from "@/lib/material-icons";
 import type { LanguageCode, ChecklistCategory, CheckItem } from "@/lib/types";
 import { useT } from "@/lib/i18n";
+import { useUiLanguage } from "@/lib/preferences-store";
 
 function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
   const svg = getIconSvg(name);
@@ -40,9 +42,10 @@ function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
 export default function ChecklistsPage() {
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
+  const uiLanguage = useUiLanguage();
   const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(null);
   const [openItem, setOpenItem] = useState<string>("");
-  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
 
   if (!data) {
     return (
@@ -216,7 +219,7 @@ export default function ChecklistsPage() {
   // List view - show all checklists
   if (!selectedChecklist) {
     return (
-      <div className="p-6 max-w-4xl">
+      <div className="p-6 max-w-4xl mx-auto">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{t("checklists.title")}</h1>
@@ -229,6 +232,12 @@ export default function ChecklistsPage() {
             {t("checklists.addChecklist")}
           </Button>
         </div>
+
+        <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+          <Info className="h-4 w-4 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">{t("checklists.infoTitle")}</AlertTitle>
+          <AlertDescription className="text-yellow-700">{t("checklists.infoText")}</AlertDescription>
+        </Alert>
 
         {checklists.length === 0 ? (
           <Card>
@@ -254,12 +263,12 @@ export default function ChecklistsPage() {
                       className="flex-1 text-left"
                     >
                       <div className="font-medium">
-                        {checklist.translations.en.title || t("checklists.untitledChecklist")}
+                        {checklist.translations[uiLanguage].title || checklist.translations.en.title || t("checklists.untitledChecklist")}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {t("checklists.taskCount", { count: checklist.tasks.length })}
-                        {checklist.translations.en.description && (
-                          <> · {checklist.translations.en.description}</>
+                        {(checklist.translations[uiLanguage].description || checklist.translations.en.description) && (
+                          <> · {checklist.translations[uiLanguage].description || checklist.translations.en.description}</>
                         )}
                       </div>
                     </button>
@@ -294,7 +303,7 @@ export default function ChecklistsPage() {
 
   // Detail view - edit selected checklist and its tasks
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <Button
           variant="ghost"
@@ -307,7 +316,7 @@ export default function ChecklistsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
-              {selectedChecklist.translations.en.title || t("checklists.untitledChecklist")}
+              {selectedChecklist.translations[uiLanguage].title || selectedChecklist.translations.en.title || t("checklists.untitledChecklist")}
             </h1>
             <p className="text-muted-foreground">
               {t("checklists.editSubtitle", { count: selectedChecklist.tasks.length })}
@@ -404,7 +413,7 @@ export default function ChecklistsPage() {
                           {index + 1}.
                         </span>
                         <span className="font-medium">
-                          {task.translations.en.title || t("checklists.taskFallback", { index: index + 1 })}
+                          {task.translations[uiLanguage].title || task.translations.en.title || t("checklists.taskFallback", { index: index + 1 })}
                         </span>
                       </div>
                     </AccordionTrigger>

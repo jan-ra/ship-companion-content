@@ -151,13 +151,13 @@ export default function OccupancyPage() {
         ...d.data,
         cabins: d.data.cabins.map((c) =>
           c.cabinNr === cabinNr
-            ? {
+            ? ({
                 ...c,
                 translations: {
                   ...c.translations,
                   [lang]: { comment },
                 },
-              }
+              } as Cabin)
             : c
         ),
       },
@@ -165,7 +165,7 @@ export default function OccupancyPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">{t("occupancy.title")}</h1>

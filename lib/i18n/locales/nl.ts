@@ -2,8 +2,8 @@ import type { Translations } from './en';
 
 export const nl = {
   app: {
-    title: 'Scheepsgezel Inhoudseditor',
-    sidebarLabel: 'Scheepsgezel Editor',
+    title: 'App Editor',
+    sidebarLabel: 'App Editor',
   },
 
   header: {
@@ -12,7 +12,7 @@ export const nl = {
     unsavedChanges: 'Niet-opgeslagen wijzigingen',
     image: 'afbeelding',
     images: 'afbeeldingen',
-    importAlert: 'Importeer een .appconf-bestand om te beginnen. Gebruik de knop "Importeren" hierboven.',
+    importAlert: 'Geen gegevens geladen. Importeer een .appconf-bestand om te beginnen.',
     openFolderTitle: 'Upload-map openen?',
     openFolderDescription: 'Wilt u de Google Drive-map openen waarnaar u het geëxporteerde bestand moet uploaden?',
     openFolderCancel: 'Nee, bedankt',
@@ -27,8 +27,11 @@ export const nl = {
     contactDetails: 'Contactgegevens',
     links: 'Links',
     cities: 'Steden',
+    map: 'Kaart',
     recipes: 'Recepten',
     general: 'Algemeen',
+    groupGeneral: 'Algemeen',
+    groupContent: 'Inhoud',
   },
 
   uiLanguage: {
@@ -74,10 +77,10 @@ export const nl = {
 
   dashboard: {
     title: 'Dashboard',
-    subtitle: 'Overzicht van uw Scheepsgezel-inhoud voor {shipName}',
-    welcomeTitle: 'Welkom bij de Scheepsgezel Editor',
-    welcomeDescription: 'Importeer een app-data.json-bestand om uw inhoud te bewerken.',
-    welcomeHint: 'Gebruik de knop "Importeren" in de koptekst om te beginnen',
+    subtitle: 'Overzicht van uw app-inhoud voor {shipName}',
+    welcomeTitle: 'Welkom bij de App Editor',
+    welcomeDescription: 'Importeer een .appconf-bestand om uw inhoud te bewerken.',
+    welcomeHint: 'U ontvangt het .appconf-bestand van de ontwikkelaar.',
     shipInformation: 'Scheepsinformatie',
     shipInformationDesc: 'Scheepsdetails, infopagina, cabines, checklists, FAQ en contacten beheren',
     mapsLocations: 'Kaarten & Locaties',
@@ -99,7 +102,7 @@ export const nl = {
 
   general: {
     title: 'Algemene instellingen',
-    subtitle: 'Algemene metagegevens en informatie over uw Scheepsgezel-app beheren',
+    subtitle: 'Algemene metagegevens en informatie over uw app beheren',
     basicInfo: 'Basisinformatie',
     basicInfoDesc: 'Scheepsnaam en versie bewerken',
     shipName: 'Scheepsnaam',
@@ -131,6 +134,7 @@ export const nl = {
     devModeLabel: 'Ontwikkelaarsmodus',
     devModeOn: 'Geavanceerde functies zijn zichtbaar',
     devModeOff: 'Sommige functies zijn verborgen',
+    devModeRequired: 'Schakel ontwikkelaarsmodus in om dit veld te bewerken',
     enableDevMode: 'Ontwikkelaarsmodus inschakelen?',
     disableDevMode: 'Ontwikkelaarsmodus uitschakelen?',
     enableDevModeDesc: 'Dit toont geavanceerde bewerkingsfuncties die normaal verborgen zijn. Schakel dit alleen in als u weet wat u doet.',
@@ -247,6 +251,8 @@ export const nl = {
     toastChecklistDeleted: 'Checklist verwijderd',
     toastTaskAdded: 'Nieuwe taak toegevoegd',
     toastTaskDeleted: 'Taak verwijderd',
+    infoTitle: 'Over checklists',
+    infoText: 'Checklists verschijnen in de app als categorieën met taken. Elke checklist heeft een pictogram, een titel en een lijst met items die gasten kunnen afvinken tijdens hun reis.',
   },
 
   faq: {
@@ -345,6 +351,10 @@ export const nl = {
     toastCityAdded: 'Nieuwe stad toegevoegd',
     toastCityDeleted: 'Stad verwijderd',
     selectCity: 'Selecteer een stad om te bewerken of voeg een nieuwe toe',
+    pasteFromMaps: 'Plakken vanuit Google Maps',
+    pasteFromMapsPlaceholder: 'bijv. 51.99648, 4.33775',
+    pasteFromMapsHint: 'Klik in Google Maps met de rechtermuisknop op een locatie en kopieer de coördinaten, plak ze dan hier.',
+    pasteFromMapsInvalid: 'Coördinaten konden niet worden herkend. Gebruik het formaat: 51.99648, 4.33775',
     pointsOfInterest: 'Bezienswaardigheden',
     pointsSubtitle: '{cityName} · {count} punten',
     addPoint: 'Punt toevoegen',
@@ -389,6 +399,9 @@ export const nl = {
     typeVegetarian: 'Vegetarisch',
     typeVegan: 'Veganistisch',
     toastAdded: 'Nieuw recept toegevoegd',
+    deleteRecipeConfirm: 'Weet u zeker dat u dit recept wilt verwijderen?',
+    infoTitle: 'Over recepten',
+    infoText: 'Recepten worden in de app weergegeven met ingrediënten en stapsgewijze instructies. Ingrediënthoeveelheden worden automatisch geschaald voor verschillende groepsgroottes.',
     backToRecipes: 'Terug naar recepten',
     recipeNotFound: 'Recept niet gevonden',
     untitledRecipe: 'Naamloos recept',

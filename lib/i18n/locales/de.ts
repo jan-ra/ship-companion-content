@@ -2,8 +2,8 @@ import type { Translations } from './en';
 
 export const de = {
   app: {
-    title: 'Schiffsbegleiter Inhaltseditor',
-    sidebarLabel: 'Schiffsbegleiter Editor',
+    title: 'App Editor',
+    sidebarLabel: 'App Editor',
   },
 
   header: {
@@ -12,7 +12,7 @@ export const de = {
     unsavedChanges: 'Ungespeicherte Änderungen',
     image: 'Bild',
     images: 'Bilder',
-    importAlert: 'Bitte importieren Sie eine .appconf-Datei. Verwenden Sie die Schaltfläche „Importieren" oben.',
+    importAlert: 'Keine Daten geladen. Bitte importieren Sie eine .appconf-Datei.',
     openFolderTitle: 'Upload-Ordner öffnen?',
     openFolderDescription: 'Möchten Sie den Google Drive-Ordner öffnen, in den Sie die exportierte Datei hochladen müssen?',
     openFolderCancel: 'Nein, danke',
@@ -27,8 +27,11 @@ export const de = {
     contactDetails: 'Kontaktdaten',
     links: 'Links',
     cities: 'Städte',
+    map: 'Karte',
     recipes: 'Rezepte',
     general: 'Allgemein',
+    groupGeneral: 'Allgemein',
+    groupContent: 'Inhalte',
   },
 
   uiLanguage: {
@@ -74,10 +77,10 @@ export const de = {
 
   dashboard: {
     title: 'Übersicht',
-    subtitle: 'Überblick über Ihre Schiffsbegleiter-Inhalte für {shipName}',
-    welcomeTitle: 'Willkommen beim Schiffsbegleiter Editor',
-    welcomeDescription: 'Importieren Sie eine app-data.json-Datei, um Ihre Inhalte zu bearbeiten.',
-    welcomeHint: 'Verwenden Sie die Schaltfläche „Importieren" in der Kopfzeile',
+    subtitle: 'Überblick über Ihre App-Inhalte für {shipName}',
+    welcomeTitle: 'Willkommen beim App Editor',
+    welcomeDescription: 'Importieren Sie eine .appconf-Datei, um Ihre Inhalte zu bearbeiten.',
+    welcomeHint: 'Die .appconf-Datei erhalten Sie vom Entwickler.',
     shipInformation: 'Schiffsinformationen',
     shipInformationDesc: 'Schiffsdetails, Info-Seite, Kabinen, Checklisten, FAQ und Kontakte verwalten',
     mapsLocations: 'Karten & Orte',
@@ -99,7 +102,7 @@ export const de = {
 
   general: {
     title: 'Allgemeine Einstellungen',
-    subtitle: 'Allgemeine Metadaten und Informationen zur Schiffsbegleiter-App verwalten',
+    subtitle: 'Allgemeine Metadaten und Informationen zur App verwalten',
     basicInfo: 'Grundinformationen',
     basicInfoDesc: 'Schiffsname und Version bearbeiten',
     shipName: 'Schiffsname',
@@ -131,6 +134,7 @@ export const de = {
     devModeLabel: 'Entwicklermodus',
     devModeOn: 'Erweiterte Funktionen sind sichtbar',
     devModeOff: 'Einige Funktionen sind ausgeblendet',
+    devModeRequired: 'Entwicklermodus aktivieren, um dieses Feld zu bearbeiten',
     enableDevMode: 'Entwicklermodus aktivieren?',
     disableDevMode: 'Entwicklermodus deaktivieren?',
     enableDevModeDesc: 'Dadurch werden erweiterte Bearbeitungsfunktionen angezeigt. Nur aktivieren, wenn Sie wissen, was Sie tun.',
@@ -247,6 +251,8 @@ export const de = {
     toastChecklistDeleted: 'Checkliste gelöscht',
     toastTaskAdded: 'Neue Aufgabe hinzugefügt',
     toastTaskDeleted: 'Aufgabe gelöscht',
+    infoTitle: 'Über Checklisten',
+    infoText: 'Checklisten erscheinen in der App als Kategorien mit Aufgaben. Jede Checkliste hat ein Symbol, einen Titel und eine Liste von Punkten, die Gäste während ihrer Reise abhaken können.',
   },
 
   faq: {
@@ -345,6 +351,10 @@ export const de = {
     toastCityAdded: 'Neue Stadt hinzugefügt',
     toastCityDeleted: 'Stadt gelöscht',
     selectCity: 'Wählen Sie eine Stadt zum Bearbeiten oder fügen Sie eine neue hinzu',
+    pasteFromMaps: 'Aus Google Maps einfügen',
+    pasteFromMapsPlaceholder: 'z. B. 51.99648, 4.33775',
+    pasteFromMapsHint: 'Klicken Sie in Google Maps mit der rechten Maustaste auf einen Ort und kopieren Sie die Koordinaten, dann fügen Sie sie hier ein.',
+    pasteFromMapsInvalid: 'Koordinaten konnten nicht erkannt werden. Format: 51.99648, 4.33775',
     pointsOfInterest: 'Sehenswürdigkeiten',
     pointsSubtitle: '{cityName} · {count} Punkte',
     addPoint: 'Punkt hinzufügen',
@@ -389,6 +399,9 @@ export const de = {
     typeVegetarian: 'Vegetarisch',
     typeVegan: 'Vegan',
     toastAdded: 'Neues Rezept hinzugefügt',
+    deleteRecipeConfirm: 'Möchten Sie dieses Rezept wirklich löschen?',
+    infoTitle: 'Über Rezepte',
+    infoText: 'Rezepte werden in der App mit Zutaten und Schritt-für-Schritt-Anleitungen angezeigt. Zutatenmengen werden automatisch für verschiedene Gruppengrößen skaliert.',
     backToRecipes: 'Zurück zu Rezepten',
     recipeNotFound: 'Rezept nicht gefunden',
     untitledRecipe: 'Unbenanntes Rezept',

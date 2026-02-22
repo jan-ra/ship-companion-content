@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +27,9 @@ export function RestoreDataDialog() {
   const [showDialog, setShowDialog] = useState(false);
   const [timestamp, setTimestamp] = useState<Date | null>(null);
   const { data, setData } = useAppDataStore();
-  const { t } = useT();
+  const { t, lang } = useT();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Only check on initial mount when there's no data loaded
@@ -48,6 +51,7 @@ export function RestoreDataDialog() {
       // Pass persistImages=false: images are already in IndexedDB, no need to clear and rewrite them
       setData(storedData, storedImages, false);
       toast.success(t("restore.toastRestored"));
+      // Stay on the current route (page was reloaded)
     }
     setShowDialog(false);
   };
@@ -56,11 +60,16 @@ export function RestoreDataDialog() {
     await clearAllStorage();
     toast.info(t("restore.toastDiscarded"));
     setShowDialog(false);
+    // Only redirect to / if not already there
+    if (pathname !== "/") {
+      router.replace("/");
+    }
   };
 
   const formatTimestamp = (date: Date | null) => {
     if (!date) return t("restore.unknownTime");
-    return date.toLocaleString();
+    const locale = lang === "de" ? "de-DE" : lang === "nl" ? "nl-NL" : "en-GB";
+    return date.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
   };
 
   return (

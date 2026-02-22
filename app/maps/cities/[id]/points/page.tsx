@@ -28,11 +28,13 @@ import {
 import { MultiLanguageInput } from "@/components/multi-language-input";
 import { MultiLanguageTextarea } from "@/components/multi-language-textarea";
 import { LanguageSelector } from "@/components/language-selector";
-import { Plus, Trash2, ArrowLeft, Navigation, List, Map, Search } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Plus, Trash2, ArrowLeft, Navigation, List, Map, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 import { OpenStreetMap } from "@/components/openstreetmap";
 import type { LanguageCode, InterestPoint, PointType } from "@/lib/types";
 import { useT } from "@/lib/i18n";
+import { useUiLanguage, useDevMode } from "@/lib/preferences-store";
 
 export default function CityPointsPage() {
   const params = useParams();
@@ -41,11 +43,14 @@ export default function CityPointsPage() {
 
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
+  const uiLanguage = useUiLanguage();
   const [selectedPointId, setSelectedPointId] = useState<number | null>(null);
   const [deletePointId, setDeletePointId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
+  const [coordPasteValue, setCoordPasteValue] = useState("");
+  const devMode = useDevMode();
 
   const POINT_TYPES: { value: PointType; label: string }[] = [
     { value: "port", label: t("cities.pointTypePort") },
@@ -172,8 +177,23 @@ export default function CityPointsPage() {
     }));
   };
 
+  const handleCoordPaste = (value: string) => {
+    setCoordPasteValue(value);
+    const match = value.trim().match(/^(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)$/);
+    if (match && selectedPoint) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        updatePoint(selectedPoint.id, { latitude: lat, longitude: lng });
+        setCoordPasteValue("");
+      } else {
+        toast.error(t("cities.pasteFromMapsInvalid"));
+      }
+    }
+  };
+
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.push("/maps/cities")} className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
@@ -185,7 +205,7 @@ export default function CityPointsPage() {
               {t("cities.pointsOfInterest")}
             </h1>
             <p className="text-muted-foreground">
-              {t("cities.pointsSubtitle", { cityName: city.translations.en.name || `City #${cityId}`, count: cityPoints.length })}
+              {t("cities.pointsSubtitle", { cityName: city.translations[uiLanguage].name || city.translations.en.name || `City #${cityId}`, count: cityPoints.length })}
             </p>
           </div>
           <Button onClick={addPoint} className="gap-2">
@@ -262,7 +282,7 @@ export default function CityPointsPage() {
                         >
                           <div className="flex-1 min-w-0">
                             <div className="font-medium truncate">
-                              {point.translations.en.name || t("cities.pointFallback", { id: point.id })}
+                              {point.translations[uiLanguage].name || point.translations.en.name || t("cities.pointFallback", { id: point.id })}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {getPointTypeLabel(point.type)}
@@ -294,7 +314,7 @@ export default function CityPointsPage() {
           <CardHeader>
             <CardTitle className="text-lg">
               {selectedPoint
-                ? selectedPoint.translations.en.name || t("cities.pointFallback", { id: selectedPoint.id })
+                ? selectedPoint.translations[uiLanguage].name || selectedPoint.translations.en.name || t("cities.pointFallback", { id: selectedPoint.id })
                 : t("cities.pointDetails")}
             </CardTitle>
           </CardHeader>
@@ -326,11 +346,27 @@ export default function CityPointsPage() {
                   <div className="space-y-2">
                     <Label>{t("cities.cityLabel")}</Label>
                     <Input
-                      value={city.translations.en.name || t("cities.cityFallback", { id: cityId })}
+                      value={city.translations[uiLanguage].name || city.translations.en.name || t("cities.cityFallback", { id: cityId })}
                       disabled
                       className="bg-muted"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t("cities.pasteFromMaps")}</Label>
+                  <Input
+                    type="text"
+                    placeholder={t("cities.pasteFromMapsPlaceholder")}
+                    value={coordPasteValue}
+                    onChange={(e) => handleCoordPaste(e.target.value)}
+                  />
+                  <Alert className="bg-yellow-50 border-yellow-200 text-yellow-800 py-2">
+                    <Info className="h-4 w-4 text-yellow-600" />
+                    <AlertDescription className="text-yellow-800 text-xs">
+                      {t("cities.pasteFromMapsHint")}
+                    </AlertDescription>
+                  </Alert>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -368,6 +404,7 @@ export default function CityPointsPage() {
                   </div>
                 </div>
 
+                {devMode && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>{t("cities.displayLatLabel")}</Label>
@@ -400,6 +437,7 @@ export default function CityPointsPage() {
                     />
                   </div>
                 </div>
+                )}
 
                 <LanguageSelector
                   value={selectedLanguage}

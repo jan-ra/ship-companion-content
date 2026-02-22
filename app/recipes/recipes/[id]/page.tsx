@@ -282,7 +282,7 @@ export default function RecipeDetailPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.push("/recipes/recipes")} className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />

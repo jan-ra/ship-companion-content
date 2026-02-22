@@ -18,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Calendar, FileJson, Ship as ShipIcon, Code, HardDrive } from "lucide-react";
+import { Calendar, FileJson, Ship as ShipIcon, Code, HardDrive, Lock } from "lucide-react";
 import { useT } from "@/lib/i18n";
 
 export default function GeneralPage() {
@@ -62,7 +62,7 @@ export default function GeneralPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">{t("general.title")}</h1>
         <p className="text-muted-foreground">
@@ -74,8 +74,13 @@ export default function GeneralPage() {
         {/* Basic Information */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("general.basicInfo")}</CardTitle>
-            <CardDescription>{t("general.basicInfoDesc")}</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              {t("general.basicInfo")}
+              {!devMode && <Lock className="h-4 w-4 text-muted-foreground" />}
+            </CardTitle>
+            <CardDescription>
+              {devMode ? t("general.basicInfoDesc") : t("general.devModeRequired")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -92,6 +97,7 @@ export default function GeneralPage() {
                     updateData((d) => ({ ...d, shipName: e.target.value }))
                   }
                   placeholder={t("general.shipNamePlaceholder")}
+                  disabled={!devMode}
                   required
                 />
               </div>
@@ -113,6 +119,7 @@ export default function GeneralPage() {
                   placeholder={t("general.versionPlaceholder")}
                   pattern="\d+\.\d+\.\d+"
                   title={t("general.versionTitle")}
+                  disabled={!devMode}
                   required
                 />
               </div>

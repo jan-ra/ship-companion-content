@@ -10,16 +10,18 @@ import { MultiLanguageTextarea } from "@/components/multi-language-textarea";
 import { MultiLanguageImageUploader } from "@/components/multi-language-image-uploader";
 import { LanguageSelector } from "@/components/language-selector";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { LanguageCode, Question } from "@/lib/types";
 import { useT } from "@/lib/i18n";
+import { useUiLanguage } from "@/lib/preferences-store";
 
 export default function FAQPage() {
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
+  const uiLanguage = useUiLanguage();
   const [openItem, setOpenItem] = useState<string>("0");
-  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
 
   if (!data) {
     return (
@@ -86,7 +88,7 @@ export default function FAQPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">{t("faq.title")}</h1>
@@ -117,9 +119,8 @@ export default function FAQPage() {
               <Card className="mb-4">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline">
                   <div className="flex items-center gap-3 flex-1 text-left">
-                    <GripVertical className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">
-                      {question.translations.en.questiontext || t("faq.questionFallback", { index: index + 1 })}
+                      {question.translations[uiLanguage].questiontext || question.translations.en.questiontext || t("faq.questionFallback", { index: index + 1 })}
                     </span>
                   </div>
                 </AccordionTrigger>

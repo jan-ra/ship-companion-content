@@ -234,17 +234,12 @@ export const useAppDataStore = create<AppDataStore>((set, get) => ({
         return state.imageUrls.get(match.key)!;
       }
 
-      // Create new URL
+      // Create new URL and cache it directly to avoid calling set() during render
       const url = URL.createObjectURL(match.blob);
-      set((s) => {
-        const newImageUrls = new Map(s.imageUrls);
-        newImageUrls.set(match.key, url);
-        // Also cache for the requested filename for faster future lookups
-        if (match.key !== filename) {
-          newImageUrls.set(filename, url);
-        }
-        return { imageUrls: newImageUrls };
-      });
+      state.imageUrls.set(match.key, url);
+      if (match.key !== filename) {
+        state.imageUrls.set(filename, url);
+      }
       return url;
     }
 

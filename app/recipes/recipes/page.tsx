@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAppDataStore } from "@/lib/store";
 import { generateId } from "@/lib/json-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,15 +15,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, UtensilsCrossed, Search, ChevronRight } from "lucide-react";
+import { Plus, UtensilsCrossed, Search, ChevronRight, Trash2, Info } from "lucide-react";
 import { toast } from "sonner";
 import type { Recipe } from "@/lib/types";
 import { useT } from "@/lib/i18n";
+import { useUiLanguage } from "@/lib/preferences-store";
 
 export default function RecipesPage() {
   const router = useRouter();
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
+  const uiLanguage = useUiLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
 
@@ -87,8 +90,20 @@ export default function RecipesPage() {
     router.push(`/recipes/recipes/${newId}`);
   };
 
+  const deleteRecipe = (id: string) => {
+    if (!confirm(t("recipes.deleteRecipeConfirm"))) return;
+    updateData((d) => ({
+      ...d,
+      data: {
+        ...d.data,
+        recipes: d.data.recipes.filter((r) => r.id !== id),
+      },
+    }));
+    toast.success(t("recipes.toastDeleted"));
+  };
+
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -103,6 +118,12 @@ export default function RecipesPage() {
           </Button>
         </div>
       </div>
+
+      <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+        <Info className="h-4 w-4 text-yellow-600" />
+        <AlertTitle className="text-yellow-800">{t("recipes.infoTitle")}</AlertTitle>
+        <AlertDescription className="text-yellow-700">{t("recipes.infoText")}</AlertDescription>
+      </Alert>
 
       <Card>
         <CardHeader className="pb-3">
@@ -152,23 +173,33 @@ export default function RecipesPage() {
                   </div>
                 ) : (
                   filteredRecipes.map((recipe) => (
-                    <button
+                    <div
                       key={recipe.id}
-                      onClick={() => router.push(`/recipes/recipes/${recipe.id}`)}
-                      className="w-full flex items-center gap-3 p-4 rounded-lg border-2 border-border text-left transition-all hover:bg-accent/50 hover:border-accent"
+                      className="w-full flex items-center gap-3 p-4 rounded-lg border-2 border-border transition-all hover:bg-accent/50 hover:border-accent"
                     >
-                      <div className="flex-1 min-w-0">
+                      <button
+                        onClick={() => router.push(`/recipes/recipes/${recipe.id}`)}
+                        className="flex-1 min-w-0 text-left"
+                      >
                         <div className="flex items-center gap-2">
                           <span className="font-medium truncate">
-                            {recipe.translations.en.title || t("recipes.recipeFallback", { id: recipe.id.slice(-6) })}
+                            {recipe.translations[uiLanguage].title || recipe.translations.en.title || t("recipes.recipeFallback", { id: recipe.id.slice(-6) })}
                           </span>
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {getRecipeTypeLabel(recipe.type)} · {t("recipes.recipeIngredients", { count: recipe.ingredients.length })}
                         </div>
-                      </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                    </button>
+                      </button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive shrink-0"
+                        onClick={() => deleteRecipe(recipe.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+                    </div>
                   ))
                 )}
               </div>

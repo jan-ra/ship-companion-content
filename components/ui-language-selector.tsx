@@ -29,10 +29,10 @@ export function UiLanguageSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2" title={t("uiLanguage.label")}>
+        <Button variant="outline" className="gap-2" title={t("uiLanguage.label")}>
           <Globe className="h-4 w-4" />
           <span className="text-sm font-medium">
-            {current.flag} {current.code.toUpperCase()}
+            {current.flag} {current.nativeLabel}
           </span>
         </Button>
       </DropdownMenuTrigger>

@@ -1,0 +1,188 @@
+# Icon definitions for Ship Companion Content Editor
+#
+# Each top-level key is a group label shown as a header in the icon picker.
+# Icons are listed as snake_case names matching the Flutter app's _iconMap keys.
+#
+# To add a new icon:
+#   1. Add it under the appropriate group (or create a new group)
+#   2. Run:  npm run sync-icons
+#      The script validates that the icon exists in @iconify-json/material-symbols
+#      and regenerates lib/material-icons.generated.ts automatically.
+
+groups:
+  - label: Home & Places
+    icons:
+      - home
+      - place
+      - location_on
+      - location_off
+      - map
+      - my_location
+      - explore
+      - directions
+      - flag
+      - anchor
+
+  - label: People & Social
+    icons:
+      - people
+      - group
+
+  - label: Media
+    icons:
+      - photo_camera
+      - video_camera_back
+      - music_note
+
+  - label: Equipment & Household
+    icons:
+      - kitchen
+      - shower
+      - bathtub
+      - wc
+      - coffee
+      - sports_bar
+      - microwave
+      - local_fire_department
+      - ac_unit
+      - wifi
+      - speaker
+      - outdoor_grill
+      - safety_check
+      - medical_services
+      - thermostat
+      - air
+      - local_laundry_service
+      - dry_cleaning
+      - bed
+      - hotel
+      - weekend
+      - chair
+      - desk
+      - light
+      - lightbulb
+      - power
+      - electrical_services
+
+  - label: Weather & Nature
+    icons:
+      - wb_sunny
+      - wb_cloudy
+      - water
+      - water_drop
+      - waves
+      - sailing
+      - cloud
+      - thunderstorm
+      - beach_access
+      - yard
+
+  - label: Time & Calendar
+    icons:
+      - event
+      - alarm
+      - timer
+
+  - label: Measurements & Tools
+    icons:
+      - straighten
+      - open_in_full
+      - width_normal
+      - height
+      - speed
+      - scale
+      - square_foot
+      - compress
+
+  - label: Food & Dining
+    icons:
+      - restaurant
+      - local_dining
+      - lunch_dining
+      - dinner_dining
+      - breakfast_dining
+      - local_pizza
+      - local_cafe
+      - local_bar
+      - cake
+      - icecream
+
+  - label: Shopping & Business
+    icons:
+      - shopping_cart
+      - shopping_bag
+      - store
+      - local_grocery_store
+
+  - label: Technology
+    icons:
+      - computer
+      - phone_iphone
+      - tablet
+      - watch
+      - tv
+      - headphones
+      - bluetooth
+      - usb
+      - battery_full
+      - battery_charging_full
+      - signal_wifi_4_bar
+      - signal_cellular_4_bar
+
+  - label: Sports & Recreation
+    icons:
+      - fitness_center
+      - pool
+      - sports
+      - sports_soccer
+      - sports_basketball
+      - sports_tennis
+      - golf_course
+      - hiking
+      - kayaking
+
+  - label: Health & Safety
+    icons:
+      - favorite
+      - favorite_border
+      - local_hospital
+      - health_and_safety
+      - masks
+      - sanitizer
+      - vaccines
+
+  - label: Miscellaneous
+    icons:
+      - star
+      - star_border
+      - star_half
+      - bookmark
+      - bookmark_border
+      - label
+      - local_offer
+      - emoji_events
+      - emoji_emotions
+      - thumb_up
+      - thumb_down
+      - visibility
+      - visibility_off
+      - lock
+      - lock_open
+      - vpn_key
+      - admin_panel_settings
+      - build
+      - construction
+      - handyman
+      - bug_report
+      - feedback
+      - grade
+      - verified
+      - verified_user
+      - security
+      - language
+      - translate
+      - public
+      - pets
+      - child_friendly
+      - smoking_rooms
+      - smoke_free
