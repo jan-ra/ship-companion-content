@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDataStore } from "@/lib/store";
 import { importAppConfFile } from "@/lib/json-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Anchor, FileJson, Upload } from "lucide-react";
+import { Anchor, FileJson, HelpCircle, Upload } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { toast } from "sonner";
 
@@ -64,6 +65,17 @@ export default function Home() {
           >
             <Upload className="h-5 w-5" />
             {t("header.import")}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="w-full gap-2"
+            asChild
+          >
+            <Link href="/help">
+              <HelpCircle className="h-5 w-5" />
+              {t("help.buttonLabel")}
+            </Link>
           </Button>
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <FileJson className="h-4 w-4 shrink-0" />

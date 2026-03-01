@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Anchor,
+  BookOpen,
   CheckSquare,
   Contact,
   FileText,
@@ -39,6 +40,7 @@ export function AppSidebar() {
 
   const generalNav = [
     { title: t("nav.general"), href: "/general", icon: Settings },
+    { title: t("help.navLabel"), href: "/help", icon: BookOpen },
   ];
 
   const contentNav = [

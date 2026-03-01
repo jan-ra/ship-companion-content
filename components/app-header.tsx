@@ -1,10 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useAppDataStore } from "@/lib/store";
 import { importAppConfFile, exportAppConfFile } from "@/lib/json-utils";
-import { Download, Upload, AlertCircle, Image, ExternalLink } from "lucide-react";
+import { Download, Upload, AlertCircle, Image, ExternalLink, HelpCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -91,6 +92,12 @@ export function AppHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button variant="ghost" asChild className="gap-2">
+            <Link href="/help">
+              <HelpCircle className="h-4 w-4" />
+              {t("help.buttonLabel")}
+            </Link>
+          </Button>
           <UiLanguageSelector />
           <input
             ref={fileInputRef}
