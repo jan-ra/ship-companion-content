@@ -14,6 +14,10 @@ import { MaterialIconSelector } from "@/components/material-icon-selector";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2, ChevronRight, ArrowLeft, Info } from "lucide-react";
 import { toast } from "sonner";
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import type { DragEndEvent } from "@dnd-kit/core";
+import { SortableItem } from "@/components/sortable-item";
 import { generateId } from "@/lib/json-utils";
 import { getIconSvg, toKebabCase } from "@/lib/material-icons";
 import type { LanguageCode, ChecklistCategory, CheckItem } from "@/lib/types";
@@ -46,6 +50,11 @@ export default function ChecklistsPage() {
   const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(null);
   const [openItem, setOpenItem] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   if (!data) {
     return (
@@ -216,6 +225,31 @@ export default function ChecklistsPage() {
     }));
   };
 
+  const reorderChecklists = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = checklists.findIndex(c => c.id === active.id);
+    const newIndex = checklists.findIndex(c => c.id === over.id);
+    updateData(d => ({ ...d, data: { ...d.data, checklists: arrayMove(d.data.checklists, oldIndex, newIndex) } }));
+  };
+
+  const reorderTasks = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id || !selectedChecklistId) return;
+    const tasks = selectedChecklist!.tasks;
+    const oldIndex = tasks.findIndex(t => t.id === active.id);
+    const newIndex = tasks.findIndex(t => t.id === over.id);
+    updateData(d => ({
+      ...d,
+      data: {
+        ...d.data,
+        checklists: d.data.checklists.map(c =>
+          c.id === selectedChecklistId
+            ? { ...c, tasks: arrayMove(c.tasks, oldIndex, newIndex) }
+            : c
+        ),
+      },
+    }));
+  };
+
   // List view - show all checklists
   if (!selectedChecklist) {
     return (
@@ -250,52 +284,58 @@ export default function ChecklistsPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-2">
-            {checklists.map((checklist) => (
-              <Card key={checklist.id} className="hover:bg-accent/50 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0">
-                      <MaterialIcon name={toKebabCase(checklist.icon)} size={32} />
-                    </div>
-                    <button
-                      onClick={() => setSelectedChecklistId(checklist.id)}
-                      className="flex-1 text-left"
-                    >
-                      <div className="font-medium">
-                        {checklist.translations[uiLanguage].title || checklist.translations.en.title || t("checklists.untitledChecklist")}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {t("checklists.taskCount", { count: checklist.tasks.length })}
-                        {(checklist.translations[uiLanguage].description || checklist.translations.en.description) && (
-                          <> · {checklist.translations[uiLanguage].description || checklist.translations.en.description}</>
-                        )}
-                      </div>
-                    </button>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteChecklist(checklist.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setSelectedChecklistId(checklist.id)}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={reorderChecklists}>
+            <SortableContext items={checklists.map(c => c.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-2">
+                {checklists.map((checklist) => (
+                  <SortableItem key={checklist.id} id={checklist.id}>
+                    <Card className="hover:bg-accent/50 transition-colors flex-1">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <div className="flex-shrink-0">
+                            <MaterialIcon name={toKebabCase(checklist.icon)} size={32} />
+                          </div>
+                          <button
+                            onClick={() => setSelectedChecklistId(checklist.id)}
+                            className="flex-1 text-left"
+                          >
+                            <div className="font-medium">
+                              {checklist.translations[uiLanguage].title || checklist.translations.en.title || t("checklists.untitledChecklist")}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {t("checklists.taskCount", { count: checklist.tasks.length })}
+                              {(checklist.translations[uiLanguage].description || checklist.translations.en.description) && (
+                                <> · {checklist.translations[uiLanguage].description || checklist.translations.en.description}</>
+                              )}
+                            </div>
+                          </button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteChecklist(checklist.id);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setSelectedChecklistId(checklist.id)}
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </SortableItem>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     );
@@ -403,81 +443,87 @@ export default function ChecklistsPage() {
               </CardContent>
             </Card>
           ) : (
-            <Accordion type="single" collapsible value={openItem} onValueChange={setOpenItem}>
-              {selectedChecklist.tasks.map((task, index) => (
-                <AccordionItem key={task.id} value={task.id}>
-                  <Card className="mb-2">
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                      <div className="flex items-center gap-3 flex-1 text-left">
-                        <span className="text-muted-foreground font-mono text-sm w-6">
-                          {index + 1}.
-                        </span>
-                        <span className="font-medium">
-                          {task.translations[uiLanguage].title || task.translations.en.title || t("checklists.taskFallback", { index: index + 1 })}
-                        </span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <CardContent className="space-y-6 pt-4">
-                        <LanguageSelector
-                          value={selectedLanguage}
-                          onChange={setSelectedLanguage}
-                          className="max-w-xs"
-                        />
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={reorderTasks}>
+              <SortableContext items={selectedChecklist.tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                <Accordion type="single" collapsible value={openItem} onValueChange={setOpenItem}>
+                  {selectedChecklist.tasks.map((task, index) => (
+                    <AccordionItem key={task.id} value={task.id} className="border-0">
+                      <Card className="mb-2">
+                        <SortableItem id={task.id} className="px-4 py-0">
+                          <AccordionTrigger className="flex-1 py-4 hover:no-underline">
+                            <div className="flex items-center gap-3 flex-1 text-left">
+                              <span className="text-muted-foreground font-mono text-sm w-6">
+                                {index + 1}.
+                              </span>
+                              <span className="font-medium">
+                                {task.translations[uiLanguage].title || task.translations.en.title || t("checklists.taskFallback", { index: index + 1 })}
+                              </span>
+                            </div>
+                          </AccordionTrigger>
+                        </SortableItem>
+                        <AccordionContent>
+                          <CardContent className="space-y-6 pt-4">
+                            <LanguageSelector
+                              value={selectedLanguage}
+                              onChange={setSelectedLanguage}
+                              className="max-w-xs"
+                            />
 
-                        <MultiLanguageInput
-                          label="Task Title"
-                          value={task.translations}
-                          field="title"
-                          onChange={(lang, value) =>
-                            updateTask(selectedChecklist.id, task.id, lang, "title", value)
-                          }
-                          placeholder="Enter task title"
-                          required
-                          selectedLanguage={selectedLanguage}
-                        />
+                            <MultiLanguageInput
+                              label="Task Title"
+                              value={task.translations}
+                              field="title"
+                              onChange={(lang, value) =>
+                                updateTask(selectedChecklist.id, task.id, lang, "title", value)
+                              }
+                              placeholder="Enter task title"
+                              required
+                              selectedLanguage={selectedLanguage}
+                            />
 
-                        <MultiLanguageTextarea
-                          label="Task Description"
-                          value={task.translations}
-                          field="description"
-                          onChange={(lang, value) =>
-                            updateTask(selectedChecklist.id, task.id, lang, "description", value)
-                          }
-                          placeholder="Enter task description"
-                          rows={3}
-                          selectedLanguage={selectedLanguage}
-                        />
+                            <MultiLanguageTextarea
+                              label="Task Description"
+                              value={task.translations}
+                              field="description"
+                              onChange={(lang, value) =>
+                                updateTask(selectedChecklist.id, task.id, lang, "description", value)
+                              }
+                              placeholder="Enter task description"
+                              rows={3}
+                              selectedLanguage={selectedLanguage}
+                            />
 
-                        <Separator />
+                            <Separator />
 
-                        <MultiLanguageImageUploader
-                          label="Task Image (optional)"
-                          value={task.translations}
-                          field="image"
-                          onChange={(lang, value) =>
-                            updateTask(selectedChecklist.id, task.id, lang, "image", value)
-                          }
-                          selectedLanguage={selectedLanguage}
-                        />
+                            <MultiLanguageImageUploader
+                              label="Task Image (optional)"
+                              value={task.translations}
+                              field="image"
+                              onChange={(lang, value) =>
+                                updateTask(selectedChecklist.id, task.id, lang, "image", value)
+                              }
+                              selectedLanguage={selectedLanguage}
+                            />
 
-                        <div className="flex justify-end">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => deleteTask(selectedChecklist.id, task.id)}
-                            className="gap-2"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            {t("checklists.deleteTask")}
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </AccordionContent>
-                  </Card>
-                </AccordionItem>
-              ))}
-            </Accordion>
+                            <div className="flex justify-end">
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => deleteTask(selectedChecklist.id, task.id)}
+                                className="gap-2"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                {t("checklists.deleteTask")}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </AccordionContent>
+                      </Card>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
       </div>

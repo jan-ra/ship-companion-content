@@ -198,6 +198,7 @@ export interface EquipmentTranslation {
 
 // FAQ types
 export interface Question {
+  id?: string;
   translations: Translations<QuestionTranslation>;
 }
 

@@ -12,6 +12,11 @@ import { LanguageSelector } from "@/components/language-selector";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import type { DragEndEvent } from "@dnd-kit/core";
+import { SortableItem } from "@/components/sortable-item";
+import { generateId } from "@/lib/json-utils";
 import type { LanguageCode, Question } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 import { useUiLanguage } from "@/lib/preferences-store";
@@ -20,8 +25,13 @@ export default function FAQPage() {
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
   const uiLanguage = useUiLanguage();
-  const [openItem, setOpenItem] = useState<string>("0");
+  const [openItem, setOpenItem] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   if (!data) {
     return (
@@ -35,6 +45,7 @@ export default function FAQPage() {
 
   const addQuestion = () => {
     const newQuestion: Question = {
+      id: generateId("faq-"),
       translations: {
         de: { questiontext: "", answertext: "" },
         en: { questiontext: "", answertext: "" },
@@ -50,8 +61,15 @@ export default function FAQPage() {
       },
     }));
 
-    setOpenItem(String(questions.length));
+    setOpenItem(newQuestion.id!);
     toast.success(t("faq.toastAdded"));
+  };
+
+  const reorderQuestions = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = questions.findIndex(q => q.id === active.id);
+    const newIndex = questions.findIndex(q => q.id === over.id);
+    updateData(d => ({ ...d, data: { ...d.data, questions: arrayMove(d.data.questions, oldIndex, newIndex) } }));
   };
 
   const removeQuestion = (index: number) => {
@@ -113,73 +131,79 @@ export default function FAQPage() {
           </CardContent>
         </Card>
       ) : (
-        <Accordion type="single" collapsible value={openItem} onValueChange={setOpenItem}>
-          {questions.map((question, index) => (
-            <AccordionItem key={index} value={String(index)}>
-              <Card className="mb-4">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                  <div className="flex items-center gap-3 flex-1 text-left">
-                    <span className="font-medium">
-                      {question.translations[uiLanguage].questiontext || question.translations.en.questiontext || t("faq.questionFallback", { index: index + 1 })}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <CardContent className="space-y-6 pt-4">
-                    <LanguageSelector
-                      value={selectedLanguage}
-                      onChange={setSelectedLanguage}
-                      className="max-w-xs"
-                    />
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={reorderQuestions}>
+          <SortableContext items={questions.map(q => q.id!)} strategy={verticalListSortingStrategy}>
+            <Accordion type="single" collapsible value={openItem} onValueChange={setOpenItem}>
+              {questions.map((question, index) => (
+                <AccordionItem key={question.id} value={question.id!} className="border-0">
+                  <Card className="mb-4">
+                    <SortableItem id={question.id!} className="px-4 py-0">
+                      <AccordionTrigger className="flex-1 py-4 hover:no-underline">
+                        <div className="flex items-center gap-3 flex-1 text-left">
+                          <span className="font-medium">
+                            {question.translations[uiLanguage].questiontext || question.translations.en.questiontext || t("faq.questionFallback", { index: index + 1 })}
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                    </SortableItem>
+                    <AccordionContent>
+                      <CardContent className="space-y-6 pt-4">
+                        <LanguageSelector
+                          value={selectedLanguage}
+                          onChange={setSelectedLanguage}
+                          className="max-w-xs"
+                        />
 
-                    <MultiLanguageInput
-                      label="Question"
-                      value={question.translations}
-                      field="questiontext"
-                      onChange={(lang, value) => updateQuestion(index, lang, "questiontext", value)}
-                      placeholder="Enter the question"
-                      required
-                      selectedLanguage={selectedLanguage}
-                    />
+                        <MultiLanguageInput
+                          label="Question"
+                          value={question.translations}
+                          field="questiontext"
+                          onChange={(lang, value) => updateQuestion(index, lang, "questiontext", value)}
+                          placeholder="Enter the question"
+                          required
+                          selectedLanguage={selectedLanguage}
+                        />
 
-                    <MultiLanguageTextarea
-                      label="Answer"
-                      value={question.translations}
-                      field="answertext"
-                      onChange={(lang, value) => updateQuestion(index, lang, "answertext", value)}
-                      placeholder="Enter the answer"
-                      rows={6}
-                      required
-                      selectedLanguage={selectedLanguage}
-                    />
+                        <MultiLanguageTextarea
+                          label="Answer"
+                          value={question.translations}
+                          field="answertext"
+                          onChange={(lang, value) => updateQuestion(index, lang, "answertext", value)}
+                          placeholder="Enter the answer"
+                          rows={6}
+                          required
+                          selectedLanguage={selectedLanguage}
+                        />
 
-                    <Separator />
+                        <Separator />
 
-                    <MultiLanguageImageUploader
-                      label="Answer Image (optional)"
-                      value={question.translations}
-                      field="answerImage"
-                      onChange={(lang, value) => updateQuestion(index, lang, "answerImage", value)}
-                      selectedLanguage={selectedLanguage}
-                    />
+                        <MultiLanguageImageUploader
+                          label="Answer Image (optional)"
+                          value={question.translations}
+                          field="answerImage"
+                          onChange={(lang, value) => updateQuestion(index, lang, "answerImage", value)}
+                          selectedLanguage={selectedLanguage}
+                        />
 
-                    <div className="flex justify-end">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => removeQuestion(index)}
-                        className="gap-2"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        {t("faq.deleteQuestion")}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </AccordionContent>
-              </Card>
-            </AccordionItem>
-          ))}
-        </Accordion>
+                        <div className="flex justify-end">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => removeQuestion(index)}
+                            className="gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            {t("faq.deleteQuestion")}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );

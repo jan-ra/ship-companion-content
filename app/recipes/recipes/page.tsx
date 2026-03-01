@@ -87,7 +87,7 @@ export default function RecipesPage() {
     }));
 
     toast.success(t("recipes.toastAdded"));
-    router.push(`/recipes/recipes/${newId}`);
+    router.push(`/recipes/recipes/detail?id=${newId}`);
   };
 
   const deleteRecipe = (id: string) => {
@@ -178,7 +178,7 @@ export default function RecipesPage() {
                       className="w-full flex items-center gap-3 p-4 rounded-lg border-2 border-border transition-all hover:bg-accent/50 hover:border-accent"
                     >
                       <button
-                        onClick={() => router.push(`/recipes/recipes/${recipe.id}`)}
+                        onClick={() => router.push(`/recipes/recipes/detail?id=${recipe.id}`)}
                         className="flex-1 min-w-0 text-left"
                       >
                         <div className="flex items-center gap-2">

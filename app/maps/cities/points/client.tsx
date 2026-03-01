@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAppDataStore } from "@/lib/store";
 import { generateNumericId } from "@/lib/json-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,9 +37,9 @@ import { useT } from "@/lib/i18n";
 import { useUiLanguage, useDevMode } from "@/lib/preferences-store";
 
 export default function CityPointsPage() {
-  const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const cityId = parseInt(params.id as string);
+  const cityId = parseInt(searchParams.get("id") ?? "0");
 
   const { data, updateData } = useAppDataStore();
   const { t } = useT();

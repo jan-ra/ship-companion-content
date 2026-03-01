@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { AppData } from './types';
+import { generateId } from './json-utils';
 import {
   saveDataToStorage,
   saveImageToStorage,
@@ -48,6 +49,24 @@ function findImageByBaseName(images: Map<string, Blob>, filename: string): { key
   }
 
   return null;
+}
+
+/**
+ * Assign stable IDs to FAQ questions that don't have one.
+ * Old .appconf files lack question IDs; we generate them on load so drag-and-drop reordering works.
+ */
+function normalizeQuestionIds(data: AppData): AppData {
+  const needsIds = data.data.questions.some(q => !q.id);
+  if (!needsIds) return data;
+  return {
+    ...data,
+    data: {
+      ...data.data,
+      questions: data.data.questions.map(q =>
+        q.id ? q : { ...q, id: generateId("faq-") }
+      ),
+    },
+  };
 }
 
 /**
@@ -110,7 +129,7 @@ export const useAppDataStore = create<AppDataStore>((set, get) => ({
     state.imageUrls.forEach((url) => URL.revokeObjectURL(url));
 
     // Normalize data on import
-    const normalized = normalizeSpices(data);
+    const normalized = normalizeQuestionIds(normalizeSpices(data));
 
     set({
       data: normalized,

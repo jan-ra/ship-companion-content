@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAppDataStore } from "@/lib/store";
 import { generateId } from "@/lib/json-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,9 +35,9 @@ import type { LanguageCode, Ingredient } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
 export default function RecipeDetailPage() {
-  const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const recipeId = params.id as string;
+  const recipeId = searchParams.get("id") ?? "";
 
   const { data, updateData } = useAppDataStore();
   const { t } = useT();

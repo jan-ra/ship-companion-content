@@ -440,7 +440,7 @@ export default function CitiesPage() {
                 <div className="flex justify-between">
                   <Button
                     variant="outline"
-                    onClick={() => router.push(`/maps/cities/${selectedCity.id}/points`)}
+                    onClick={() => router.push(`/maps/cities/points?id=${selectedCity.id}`)}
                     className="gap-2"
                   >
                     <Navigation className="h-4 w-4" />
