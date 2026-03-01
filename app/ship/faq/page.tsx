@@ -10,6 +10,9 @@ import { MultiLanguageTextarea } from "@/components/multi-language-textarea";
 import { MultiLanguageImageUploader } from "@/components/multi-language-image-uploader";
 import { LanguageSelector } from "@/components/language-selector";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -19,12 +22,13 @@ import { SortableItem } from "@/components/sortable-item";
 import { generateId } from "@/lib/json-utils";
 import type { LanguageCode, Question } from "@/lib/types";
 import { useT } from "@/lib/i18n";
-import { useUiLanguage } from "@/lib/preferences-store";
+import { useUiLanguage, useDevMode } from "@/lib/preferences-store";
 
 export default function FAQPage() {
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
   const uiLanguage = useUiLanguage();
+  const devMode = useDevMode();
   const [openItem, setOpenItem] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
 
@@ -94,12 +98,25 @@ export default function FAQPage() {
           i === index
             ? {
                 ...q,
+                customerEdited: true,
                 translations: {
                   ...q.translations,
                   [lang]: { ...q.translations[lang], [field]: value },
                 },
               }
             : q
+        ),
+      },
+    }));
+  };
+
+  const setQuestionCustomerEdited = (index: number, value: boolean) => {
+    updateData((d) => ({
+      ...d,
+      data: {
+        ...d.data,
+        questions: d.data.questions.map((q, i) =>
+          i === index ? { ...q, customerEdited: value } : q
         ),
       },
     }));
@@ -136,18 +153,30 @@ export default function FAQPage() {
             <Accordion type="single" collapsible value={openItem} onValueChange={setOpenItem}>
               {questions.map((question, index) => (
                 <AccordionItem key={question.id} value={question.id!} className="border-0">
-                  <Card className="mb-4">
+                  <Card className={`mb-4 ${question.customerEdited ? "border-amber-300" : ""}`}>
                     <SortableItem id={question.id!} className="px-4 py-0">
                       <AccordionTrigger className="flex-1 py-4 hover:no-underline">
                         <div className="flex items-center gap-3 flex-1 text-left">
                           <span className="font-medium">
                             {question.translations[uiLanguage].questiontext || question.translations.en.questiontext || t("faq.questionFallback", { index: index + 1 })}
                           </span>
+                          {question.customerEdited && (
+                            <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs shrink-0">
+                              Edited
+                            </Badge>
+                          )}
                         </div>
                       </AccordionTrigger>
                     </SortableItem>
                     <AccordionContent>
                       <CardContent className="space-y-6 pt-4">
+                        {question.customerEdited && (
+                          <div>
+                            <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs">
+                              Edited
+                            </Badge>
+                          </div>
+                        )}
                         <LanguageSelector
                           value={selectedLanguage}
                           onChange={setSelectedLanguage}
@@ -185,7 +214,16 @@ export default function FAQPage() {
                           selectedLanguage={selectedLanguage}
                         />
 
-                        <div className="flex justify-end">
+                        <div className="flex items-center justify-between">
+                          {devMode ? (
+                            <div className="flex items-center gap-3">
+                              <Switch
+                                checked={question.customerEdited === true}
+                                onCheckedChange={(checked) => setQuestionCustomerEdited(index, checked)}
+                              />
+                              <Label className="font-normal">Customer Edited</Label>
+                            </div>
+                          ) : <div />}
                           <Button
                             variant="destructive"
                             size="sm"

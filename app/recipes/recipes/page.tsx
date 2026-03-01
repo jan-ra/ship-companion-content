@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Plus, UtensilsCrossed, Search, ChevronRight, Trash2, Info } from "lucide-react";
 import { toast } from "sonner";
 import type { Recipe } from "@/lib/types";
@@ -175,7 +176,7 @@ export default function RecipesPage() {
                   filteredRecipes.map((recipe) => (
                     <div
                       key={recipe.id}
-                      className="w-full flex items-center gap-3 p-4 rounded-lg border-2 border-border transition-all hover:bg-accent/50 hover:border-accent"
+                      className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all hover:bg-accent/50 hover:border-accent ${recipe.customerEdited ? "border-amber-300 bg-amber-50/40" : "border-border"}`}
                     >
                       <button
                         onClick={() => router.push(`/recipes/recipes/detail?id=${recipe.id}`)}
@@ -185,6 +186,11 @@ export default function RecipesPage() {
                           <span className="font-medium truncate">
                             {recipe.translations[uiLanguage].title || recipe.translations.en.title || t("recipes.recipeFallback", { id: recipe.id.slice(-6) })}
                           </span>
+                          {recipe.customerEdited && (
+                            <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs shrink-0">
+                              Edited
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {getRecipeTypeLabel(recipe.type)} · {t("recipes.recipeIngredients", { count: recipe.ingredients.length })}

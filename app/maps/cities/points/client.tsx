@@ -29,6 +29,8 @@ import { MultiLanguageInput } from "@/components/multi-language-input";
 import { MultiLanguageTextarea } from "@/components/multi-language-textarea";
 import { LanguageSelector } from "@/components/language-selector";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2, ArrowLeft, Navigation, List, Map, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 import { OpenStreetMap } from "@/components/openstreetmap";
@@ -147,12 +149,14 @@ export default function CityPointsPage() {
     toast.success(t("cities.toastPointDeleted"));
   };
 
-  const updatePoint = (id: number, updates: Partial<InterestPoint>) => {
+  const updatePoint = (id: number, updates: Partial<InterestPoint>, skipCustomerEdited = false) => {
     updateData((d) => ({
       ...d,
       data: {
         ...d.data,
-        points: d.data.points.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+        points: d.data.points.map((p) =>
+          p.id === id ? { ...p, ...updates, ...(skipCustomerEdited ? {} : { customerEdited: true }) } : p
+        ),
       },
     }));
   };
@@ -166,6 +170,7 @@ export default function CityPointsPage() {
           p.id === id
             ? {
                 ...p,
+                customerEdited: true,
                 translations: {
                   ...p.translations,
                   [lang]: { ...p.translations[lang], [field]: value },
@@ -278,11 +283,20 @@ export default function CityPointsPage() {
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all
                             ${selectedPointId === point.id
                               ? "bg-primary/10 border-primary ring-2 ring-primary/20"
-                              : "border-border hover:bg-accent/50 hover:border-accent"}`}
+                              : point.customerEdited
+                                ? "border-amber-300 bg-amber-50/40 hover:bg-amber-50/70 hover:border-amber-400"
+                                : "border-border hover:bg-accent/50 hover:border-accent"}`}
                         >
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">
-                              {point.translations[uiLanguage].name || point.translations.en.name || t("cities.pointFallback", { id: point.id })}
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium truncate">
+                                {point.translations[uiLanguage].name || point.translations.en.name || t("cities.pointFallback", { id: point.id })}
+                              </span>
+                              {point.customerEdited && (
+                                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs shrink-0">
+                                  Edited
+                                </Badge>
+                              )}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {getPointTypeLabel(point.type)}
@@ -312,11 +326,18 @@ export default function CityPointsPage() {
         {/* Point Edit Form */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="text-lg">
-              {selectedPoint
-                ? selectedPoint.translations[uiLanguage].name || selectedPoint.translations.en.name || t("cities.pointFallback", { id: selectedPoint.id })
-                : t("cities.pointDetails")}
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-lg">
+                {selectedPoint
+                  ? selectedPoint.translations[uiLanguage].name || selectedPoint.translations.en.name || t("cities.pointFallback", { id: selectedPoint.id })
+                  : t("cities.pointDetails")}
+              </CardTitle>
+              {selectedPoint?.customerEdited && (
+                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs">
+                  Edited
+                </Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {selectedPoint ? (
@@ -466,7 +487,16 @@ export default function CityPointsPage() {
                   selectedLanguage={selectedLanguage}
                 />
 
-                <div className="flex justify-end">
+                <div className="flex items-center justify-between">
+                  {devMode ? (
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        checked={selectedPoint.customerEdited === true}
+                        onCheckedChange={(checked) => updatePoint(selectedPoint.id, { customerEdited: checked }, true)}
+                      />
+                      <Label className="font-normal">Customer Edited</Label>
+                    </div>
+                  ) : <div />}
                   <Button
                     variant="destructive"
                     size="sm"

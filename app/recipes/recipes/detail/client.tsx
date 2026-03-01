@@ -29,10 +29,13 @@ import { MultiLanguageInput } from "@/components/multi-language-input";
 import { MultiLanguageTextarea } from "@/components/multi-language-textarea";
 import { LanguageSelector } from "@/components/language-selector";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Plus, Trash2, X, Info } from "lucide-react";
 import { toast } from "sonner";
 import type { LanguageCode, Ingredient } from "@/lib/types";
 import { useT } from "@/lib/i18n";
+import { useDevMode } from "@/lib/preferences-store";
 
 export default function RecipeDetailPage() {
   const searchParams = useSearchParams();
@@ -41,6 +44,7 @@ export default function RecipeDetailPage() {
 
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
+  const devMode = useDevMode();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>("en");
 
@@ -72,12 +76,14 @@ export default function RecipeDetailPage() {
     );
   }
 
-  const updateRecipe = (updates: Partial<typeof recipe>) => {
+  const updateRecipe = (updates: Partial<typeof recipe>, skipCustomerEdited = false) => {
     updateData((d) => ({
       ...d,
       data: {
         ...d.data,
-        recipes: d.data.recipes.map((r) => (r.id === recipeId ? { ...r, ...updates } : r)),
+        recipes: d.data.recipes.map((r) =>
+          r.id === recipeId ? { ...r, ...updates, ...(skipCustomerEdited ? {} : { customerEdited: true }) } : r
+        ),
       },
     }));
   };
@@ -91,6 +97,7 @@ export default function RecipeDetailPage() {
           r.id === recipeId
             ? {
                 ...r,
+                customerEdited: true,
                 translations: {
                   ...r.translations,
                   [lang]: { ...r.translations[lang], [field]: value },
@@ -113,6 +120,7 @@ export default function RecipeDetailPage() {
           steps[index] = value;
           return {
             ...r,
+            customerEdited: true,
             translations: {
               ...r.translations,
               [lang]: { ...r.translations[lang], instructions: steps },
@@ -132,6 +140,7 @@ export default function RecipeDetailPage() {
           if (r.id !== recipeId) return r;
           return {
             ...r,
+            customerEdited: true,
             translations: {
               de: { ...r.translations.de, instructions: [...r.translations.de.instructions, ""] },
               en: { ...r.translations.en, instructions: [...r.translations.en.instructions, ""] },
@@ -152,6 +161,7 @@ export default function RecipeDetailPage() {
           if (r.id !== recipeId) return r;
           return {
             ...r,
+            customerEdited: true,
             translations: {
               de: { ...r.translations.de, instructions: r.translations.de.instructions.filter((_, i) => i !== index) },
               en: { ...r.translations.en, instructions: r.translations.en.instructions.filter((_, i) => i !== index) },
@@ -193,7 +203,7 @@ export default function RecipeDetailPage() {
         ...d.data,
         recipes: d.data.recipes.map((r) =>
           r.id === recipeId
-            ? { ...r, ingredients: [...r.ingredients, newIngredient] }
+            ? { ...r, customerEdited: true, ingredients: [...r.ingredients, newIngredient] }
             : r
         ),
       },
@@ -207,7 +217,7 @@ export default function RecipeDetailPage() {
         ...d.data,
         recipes: d.data.recipes.map((r) =>
           r.id === recipeId
-            ? { ...r, ingredients: r.ingredients.filter((i) => i.id !== ingredientId) }
+            ? { ...r, customerEdited: true, ingredients: r.ingredients.filter((i) => i.id !== ingredientId) }
             : r
         ),
       },
@@ -223,6 +233,7 @@ export default function RecipeDetailPage() {
           r.id === recipeId
             ? {
                 ...r,
+                customerEdited: true,
                 ingredients: r.ingredients.map((i) =>
                   i.id === ingredientId ? { ...i, ...updates } : i
                 ),
@@ -242,6 +253,7 @@ export default function RecipeDetailPage() {
           r.id === recipeId
             ? {
                 ...r,
+                customerEdited: true,
                 ingredients: r.ingredients.map((i) =>
                   i.id === ingredientId
                     ? {
@@ -270,6 +282,7 @@ export default function RecipeDetailPage() {
           r.id === recipeId
             ? {
                 ...r,
+                customerEdited: true,
                 spices: {
                   ...r.spices,
                   [lang]: spices,
@@ -288,9 +301,16 @@ export default function RecipeDetailPage() {
           <ArrowLeft className="h-4 w-4" />
           {t("common.backToRecipes")}
         </Button>
-        <h1 className="text-3xl font-bold mb-2">
-          {recipe.translations.en.title || t("recipes.untitledRecipe")}
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold">
+            {recipe.translations.en.title || t("recipes.untitledRecipe")}
+          </h1>
+          {recipe.customerEdited && (
+            <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs">
+              Edited
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground">
           {t("recipes.editSubtitle")}
         </p>
@@ -513,6 +533,21 @@ export default function RecipeDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Dev Mode: customerEdited toggle */}
+        {devMode && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={recipe.customerEdited === true}
+                  onCheckedChange={(checked) => updateRecipe({ customerEdited: checked }, true)}
+                />
+                <Label className="font-normal">Customer Edited</Label>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Delete */}
         <Card className="border-destructive/50">

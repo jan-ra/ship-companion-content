@@ -24,6 +24,7 @@ import { MultiLanguageTextarea } from "@/components/multi-language-textarea";
 import { LanguageSelector } from "@/components/language-selector";
 import { OpenStreetMap } from "@/components/openstreetmap";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, MapPin, Navigation, List, Map, Search, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useDevMode, useUiLanguage } from "@/lib/preferences-store";
@@ -107,12 +108,14 @@ export default function CitiesPage() {
     toast.success(t("cities.toastCityDeleted"));
   };
 
-  const updateCity = (id: number, updates: Partial<City>) => {
+  const updateCity = (id: number, updates: Partial<City>, skipCustomerEdited = false) => {
     updateData((d) => ({
       ...d,
       data: {
         ...d.data,
-        cities: d.data.cities.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+        cities: d.data.cities.map((c) =>
+          c.id === id ? { ...c, ...updates, ...(skipCustomerEdited ? {} : { customerEdited: true }) } : c
+        ),
       },
     }));
   };
@@ -126,6 +129,7 @@ export default function CitiesPage() {
           c.id === id
             ? {
                 ...c,
+                customerEdited: true,
                 translations: {
                   ...c.translations,
                   [lang]: { ...c.translations[lang], [field]: value },
@@ -260,11 +264,20 @@ export default function CitiesPage() {
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all
                             ${selectedCityId === city.id
                               ? "bg-primary/10 border-primary ring-2 ring-primary/20"
-                              : "border-border hover:bg-accent/50 hover:border-accent"}`}
+                              : city.customerEdited
+                                ? "border-amber-300 bg-amber-50/40 hover:bg-amber-50/70 hover:border-amber-400"
+                                : "border-border hover:bg-accent/50 hover:border-accent"}`}
                         >
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">
-                              {city.translations[uiLanguage].name || city.translations.en.name || t("cities.cityFallback", { id: city.id })}
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium truncate">
+                                {city.translations[uiLanguage].name || city.translations.en.name || t("cities.cityFallback", { id: city.id })}
+                              </span>
+                              {city.customerEdited && (
+                                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs shrink-0">
+                                  Edited
+                                </Badge>
+                              )}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {cityPointCount !== 1 ? t("cities.cityPoiCount_other", { count: cityPointCount }) : t("cities.cityPoiCount_one", { count: cityPointCount })} · ({city.latitude.toFixed(2)}, {city.longitude.toFixed(2)})
@@ -295,11 +308,18 @@ export default function CitiesPage() {
         {/* City Edit Form */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="text-lg">
-              {selectedCity
-                ? selectedCity.translations.en.name || t("cities.cityFallback", { id: selectedCity.id })
-                : t("cities.cityDetails")}
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-lg">
+                {selectedCity
+                  ? selectedCity.translations.en.name || t("cities.cityFallback", { id: selectedCity.id })
+                  : t("cities.cityDetails")}
+              </CardTitle>
+              {selectedCity?.customerEdited && (
+                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs">
+                  Edited
+                </Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {selectedCity ? (
@@ -436,6 +456,16 @@ export default function CitiesPage() {
                   required
                   selectedLanguage={selectedLanguage}
                 />
+
+                {devMode && (
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={selectedCity.customerEdited === true}
+                      onCheckedChange={(checked) => updateCity(selectedCity.id, { customerEdited: checked }, true)}
+                    />
+                    <Label className="font-normal">Customer Edited</Label>
+                  </div>
+                )}
 
                 <div className="flex justify-between">
                   <Button

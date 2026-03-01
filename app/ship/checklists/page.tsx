@@ -12,6 +12,9 @@ import { MultiLanguageImageUploader } from "@/components/multi-language-image-up
 import { LanguageSelector } from "@/components/language-selector";
 import { MaterialIconSelector } from "@/components/material-icon-selector";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Plus, Trash2, ChevronRight, ArrowLeft, Info } from "lucide-react";
 import { toast } from "sonner";
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -22,7 +25,7 @@ import { generateId } from "@/lib/json-utils";
 import { getIconSvg, toKebabCase } from "@/lib/material-icons";
 import type { LanguageCode, ChecklistCategory, CheckItem } from "@/lib/types";
 import { useT } from "@/lib/i18n";
-import { useUiLanguage } from "@/lib/preferences-store";
+import { useUiLanguage, useDevMode } from "@/lib/preferences-store";
 
 function MaterialIcon({ name, size = 24 }: { name: string; size?: number }) {
   const svg = getIconSvg(name);
@@ -47,6 +50,7 @@ export default function ChecklistsPage() {
   const { data, updateData } = useAppDataStore();
   const { t } = useT();
   const uiLanguage = useUiLanguage();
+  const devMode = useDevMode();
   const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(null);
   const [openItem, setOpenItem] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(uiLanguage);
@@ -111,13 +115,13 @@ export default function ChecklistsPage() {
     }
   };
 
-  const updateChecklist = (id: string, updates: Partial<ChecklistCategory>) => {
+  const updateChecklist = (id: string, updates: Partial<ChecklistCategory>, skipCustomerEdited = false) => {
     updateData((d) => ({
       ...d,
       data: {
         ...d.data,
         checklists: d.data.checklists.map((c) =>
-          c.id === id ? { ...c, ...updates } : c
+          c.id === id ? { ...c, ...updates, ...(skipCustomerEdited ? {} : { customerEdited: true }) } : c
         ),
       },
     }));
@@ -137,6 +141,7 @@ export default function ChecklistsPage() {
           c.id === id
             ? {
                 ...c,
+                customerEdited: true,
                 translations: {
                   ...c.translations,
                   [lang]: { ...c.translations[lang], [field]: value },
@@ -211,12 +216,32 @@ export default function ChecklistsPage() {
                   t.id === taskId
                     ? {
                         ...t,
+                        customerEdited: true,
                         translations: {
                           ...t.translations,
                           [lang]: { ...t.translations[lang], [field]: value },
                         },
                       }
                     : t
+                ),
+              }
+            : c
+        ),
+      },
+    }));
+  };
+
+  const setTaskCustomerEdited = (checklistId: string, taskId: string, value: boolean) => {
+    updateData((d) => ({
+      ...d,
+      data: {
+        ...d.data,
+        checklists: d.data.checklists.map((c) =>
+          c.id === checklistId
+            ? {
+                ...c,
+                tasks: c.tasks.map((t) =>
+                  t.id === taskId ? { ...t, customerEdited: value } : t
                 ),
               }
             : c
@@ -289,7 +314,7 @@ export default function ChecklistsPage() {
               <div className="space-y-2">
                 {checklists.map((checklist) => (
                   <SortableItem key={checklist.id} id={checklist.id}>
-                    <Card className="hover:bg-accent/50 transition-colors flex-1">
+                    <Card className={`hover:bg-accent/50 transition-colors flex-1 ${checklist.customerEdited ? "border-amber-300" : ""}`}>
                       <CardContent className="p-4">
                         <div className="flex items-center gap-4">
                           <div className="flex-shrink-0">
@@ -299,8 +324,15 @@ export default function ChecklistsPage() {
                             onClick={() => setSelectedChecklistId(checklist.id)}
                             className="flex-1 text-left"
                           >
-                            <div className="font-medium">
-                              {checklist.translations[uiLanguage].title || checklist.translations.en.title || t("checklists.untitledChecklist")}
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">
+                                {checklist.translations[uiLanguage].title || checklist.translations.en.title || t("checklists.untitledChecklist")}
+                              </span>
+                              {checklist.customerEdited && (
+                                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs shrink-0">
+                                  Edited
+                                </Badge>
+                              )}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {t("checklists.taskCount", { count: checklist.tasks.length })}
@@ -355,9 +387,16 @@ export default function ChecklistsPage() {
         </Button>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">
-              {selectedChecklist.translations[uiLanguage].title || selectedChecklist.translations.en.title || t("checklists.untitledChecklist")}
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold">
+                {selectedChecklist.translations[uiLanguage].title || selectedChecklist.translations.en.title || t("checklists.untitledChecklist")}
+              </h1>
+              {selectedChecklist.customerEdited && (
+                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs">
+                  Edited
+                </Badge>
+              )}
+            </div>
             <p className="text-muted-foreground">
               {t("checklists.editSubtitle", { count: selectedChecklist.tasks.length })}
             </p>
@@ -419,6 +458,16 @@ export default function ChecklistsPage() {
               rows={2}
               selectedLanguage={selectedLanguage}
             />
+
+            {devMode && (
+              <div className="flex items-center gap-3 pt-2">
+                <Switch
+                  checked={selectedChecklist.customerEdited === true}
+                  onCheckedChange={(checked) => updateChecklist(selectedChecklist.id, { customerEdited: checked }, true)}
+                />
+                <Label className="font-normal">Customer Edited</Label>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -448,7 +497,7 @@ export default function ChecklistsPage() {
                 <Accordion type="single" collapsible value={openItem} onValueChange={setOpenItem}>
                   {selectedChecklist.tasks.map((task, index) => (
                     <AccordionItem key={task.id} value={task.id} className="border-0">
-                      <Card className="mb-2">
+                      <Card className={`mb-2 ${task.customerEdited ? "border-amber-300" : ""}`}>
                         <SortableItem id={task.id} className="px-4 py-0">
                           <AccordionTrigger className="flex-1 py-4 hover:no-underline">
                             <div className="flex items-center gap-3 flex-1 text-left">
@@ -458,6 +507,11 @@ export default function ChecklistsPage() {
                               <span className="font-medium">
                                 {task.translations[uiLanguage].title || task.translations.en.title || t("checklists.taskFallback", { index: index + 1 })}
                               </span>
+                              {task.customerEdited && (
+                                <Badge variant="outline" className="text-amber-700 border-amber-400 bg-amber-50 text-xs shrink-0">
+                                  Edited
+                                </Badge>
+                              )}
                             </div>
                           </AccordionTrigger>
                         </SortableItem>
@@ -505,7 +559,16 @@ export default function ChecklistsPage() {
                               selectedLanguage={selectedLanguage}
                             />
 
-                            <div className="flex justify-end">
+                            <div className="flex items-center justify-between">
+                              {devMode ? (
+                                <div className="flex items-center gap-3">
+                                  <Switch
+                                    checked={task.customerEdited === true}
+                                    onCheckedChange={(checked) => setTaskCustomerEdited(selectedChecklist.id, task.id, checked)}
+                                  />
+                                  <Label className="font-normal">Customer Edited</Label>
+                                </div>
+                              ) : <div />}
                               <Button
                                 variant="destructive"
                                 size="sm"

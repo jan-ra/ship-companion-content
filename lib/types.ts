@@ -20,6 +20,7 @@ export interface Recipe {
   };
   translations: Translations<RecipeTranslation>;
   isFavorite?: boolean;
+  customerEdited?: boolean;
 }
 
 export interface RecipeTranslation {
@@ -51,6 +52,7 @@ export interface InterestPoint {
   type: PointType;
   cityId: number;
   translations: Translations<LocationTranslation>;
+  customerEdited?: boolean;
 }
 
 export interface City {
@@ -62,6 +64,7 @@ export interface City {
   zoomLevel: number;
   isIsland: "yes" | "no";
   translations: Translations<LocationTranslation>;
+  customerEdited?: boolean;
 }
 
 export interface LocationTranslation {
@@ -75,6 +78,7 @@ export interface ChecklistCategory {
   icon: string;
   tasks: CheckItem[];
   translations: Translations<ChecklistCategoryTranslation>;
+  customerEdited?: boolean;
 }
 
 export interface ChecklistCategoryTranslation {
@@ -85,6 +89,7 @@ export interface ChecklistCategoryTranslation {
 export interface CheckItem {
   id: string;
   translations: Translations<CheckItemTranslation>;
+  customerEdited?: boolean;
 }
 
 export interface CheckItemTranslation {
@@ -200,6 +205,7 @@ export interface EquipmentTranslation {
 export interface Question {
   id?: string;
   translations: Translations<QuestionTranslation>;
+  customerEdited?: boolean;
 }
 
 export interface QuestionTranslation {
